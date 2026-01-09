@@ -1,0 +1,9 @@
+localhost {
+	respond "HTTPS localhost OK"
+	tls internal
+}
+
+saas.localhost {
+	respond "HTTPS saas.localhost OK"
+	tls internal
+}
