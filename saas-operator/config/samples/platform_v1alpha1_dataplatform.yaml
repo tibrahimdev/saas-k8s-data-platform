@@ -1,0 +1,9 @@
+apiVersion: platform.tibrahim.dev/v1alpha1
+kind: DataPlatform
+metadata:
+  labels:
+    app.kubernetes.io/name: saas-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: dataplatform-sample
+spec:
+  # TODO(user): Add fields here

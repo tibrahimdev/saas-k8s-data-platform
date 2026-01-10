@@ -9,4 +9,14 @@ layout:
 multigroup: true
 projectName: saas-operator
 repo: github.com/tibrahimdev/saas-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: tibrahim.dev
+  group: platform
+  kind: DataPlatform
+  path: github.com/tibrahimdev/saas-operator/api/platform/v1alpha1
+  version: v1alpha1
 version: "3"
