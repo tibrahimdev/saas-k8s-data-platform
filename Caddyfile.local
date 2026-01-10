@@ -7,3 +7,26 @@ saas.localhost {
 	respond "HTTPS saas.localhost OK"
 	tls internal
 }
+
+saas-sso.localhost {
+	reverse_proxy localhost:8080 {
+		header_up X-Forwarded-Proto https
+	}
+	tls internal
+}
+
+saas-temporal.localhost {
+	reverse_proxy localhost:9080
+	tls internal
+}
+
+saas-control-plane.localhost {
+	reverse_proxy localhost:3000
+	tls internal
+}
+
+saas-ui.localhost {
+	# reverse_proxy localhost:3001
+	respond "HTTPS saas-ui.localhost no service port configured"
+	tls internal
+}
