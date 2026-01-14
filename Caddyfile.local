@@ -20,13 +20,18 @@ saas-temporal.localhost {
 	tls internal
 }
 
+saas-cerbos.localhost {
+	reverse_proxy localhost:3592
+	tls internal
+}
+
 saas-control-plane.localhost {
-	reverse_proxy localhost:3000
+	reverse_proxy localhost:5001
 	tls internal
 }
 
 saas-ui.localhost {
-	# reverse_proxy localhost:3001
-	respond "HTTPS saas-ui.localhost no service port configured"
+	reverse_proxy localhost:5000
+	# respond "HTTPS saas-ui.localhost no service port configured"
 	tls internal
 }
