@@ -1,0 +1,14 @@
+saas.local {
+	respond "HTTPS OK"
+	tls internal
+}
+
+api.saas.local {
+	respond "HTTPS OK"
+	tls internal
+}
+
+myservice.saas.local {
+	respond "HTTPS OK"
+	tls internal
+}
