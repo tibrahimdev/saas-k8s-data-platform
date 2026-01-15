@@ -1,6 +1,54 @@
 # Setting Up Local DNS and HTTPS Certificate
 
-This quickstart sets up **local DNS + HTTPS** for any local Kubernetes cluster (k3s, kind, k3d) using:
+This guide describes the architecture and concept for setting up local DNS + trusted HTTPS for any local Kubernetes cluster (k3s, kind, k3d) using a single private Certificate Authority (CA).
+
+Instead of ad-hoc certificates (mkcert, self-signed per service), we use Step CA to:
+- Create one trusted root CA
+- Issue multiple TLS certificates automatically
+- Reuse the same trust chain across:
+  - Kubernetes Ingress
+  - Reverse proxies
+  - Local development tools
+  - Browsers on Windows/macOS/Linux
+
+## Run The Services
+
+```bash
+sudo docker compose up -d
+```
+## Step 3 — Start Step CA
+
+Start the CA:
+
+```bash
+docker compose up -d
+```
+
+Verify it is running:
+
+```bash
+docker ps | grep step-ca
+```
+
+Check health:
+
+```bash
+curl http://localhost:9000/health
+```
+
+Expected output:
+
+```
+{"status":"ok"}
+```
+
+
+
+
+
+
+
+This mirrors how HTTPS works in real production environments.
 
 * **PowerDNS** – authoritative DNS (`*.saas.test`)
 * **ExternalDNS (RFC2136)** – automatic DNS records from Kubernetes
