@@ -19,67 +19,68 @@ services:
     container_name: step-ca
     networks:
       pdns:
+        ipv4_address: 172.30.0.21
     ports:
       - "9000:9000"
     volumes:
       - ./_data/step-ca:/home/step
     restart: unless-stopped
 
-  # mariadb:
-  #   container_name: pdns-mariadb
-  #   image: mariadb:lts-ubi
-  #   networks:
-  #     pdns:
-  #       aliases:
-  #         - db
-  #         - mysql
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #     - mariadb:/var/lib/mysql:Z
-  #   environment:
-  #     - MYSQL_ROOT_PASSWORD=my-secret-pw
-  #   healthcheck:
-  #     test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
-  #     timeout: 10s
-  #     retries: 5
+  mariadb:
+    container_name: pdns-mariadb
+    image: mariadb:lts-ubi
+    networks:
+      pdns:
+        aliases:
+          - db
+          - mysql
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - mariadb:/var/lib/mysql:Z
+    environment:
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      timeout: 10s
+      retries: 5
 
-  # pdns-mysql-master:
-  #   image: pschiffe/pdns-mysql:5.0-alpine
-  #   container_name: pdns-mysql-master 
-  #   hostname: ns1.example.com
-  #   networks:
-  #     pdns:
-  #       ipv4_address: 172.30.0.20
-  #       aliases:
-  #         - pdns
-  #   ports:
-  #     - "53:53/udp"
-  #     - "53:53/tcp"
-  #     - "8081:8081" # API for the UI to talk to
-  #   extra_hosts:
-  #     - 'ns1.saas.test:172.30.0.20'
-  #     # - 'ns2.example.com:172.30.0.21'
-  #   volumes:
-  #     - /etc/localtime:/etc/localtime:ro
-  #   environment:
-  #     - PDNS_gmysql_password=my-secret-pw
-  #     - PDNS_primary=yes
-  #     - PDNS_api=yes
-  #     - PDNS_api_key=secret
-  #     - PDNS_webserver=yes
-  #     - PDNS_webserver_address=0.0.0.0
-  #     # - PDNS_webserver_allow_from=172.6.0.0/16
-  #     - PDNS_webserver_allow_from=0.0.0.0/0
-  #     - PDNS_version_string=anonymous
-  #     - PDNS_default_ttl=1500
-  #     - PDNS_allow_axfr_ips=0.0.0.0/0
-  #     - PDNS_only_notify=0.0.0.0/0
-  #     - PDNS_log_dns_queries=true
-  #     - PDNS_dnsupdate=true
-  #     - PDNS_allow_dnsupdate_from=0.0.0.0/0
-  #     # - PDNS_allow_query=0.0.0.0/0
-  #   depends_on:
-  #     - mariadb
+  pdns-mysql-master:
+    image: pschiffe/pdns-mysql:5.0-alpine
+    container_name: pdns-mysql-master 
+    hostname: ns1.example.com
+    networks:
+      pdns:
+        ipv4_address: 172.30.0.20
+        aliases:
+          - pdns
+    ports:
+      - "53:53/udp"
+      - "53:53/tcp"
+      - "8081:8081" # API for the UI to talk to
+    extra_hosts:
+      - 'ns1.saas.test:172.30.0.20'
+      # - 'ns2.example.com:172.30.0.21'
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - PDNS_gmysql_password=my-secret-pw
+      - PDNS_primary=yes
+      - PDNS_api=yes
+      - PDNS_api_key=secret
+      - PDNS_webserver=yes
+      - PDNS_webserver_address=0.0.0.0
+      # - PDNS_webserver_allow_from=172.6.0.0/16
+      - PDNS_webserver_allow_from=0.0.0.0/0
+      - PDNS_version_string=anonymous
+      - PDNS_default_ttl=1500
+      - PDNS_allow_axfr_ips=0.0.0.0/0
+      - PDNS_only_notify=0.0.0.0/0
+      - PDNS_log_dns_queries=true
+      - PDNS_dnsupdate=true
+      - PDNS_allow_dnsupdate_from=0.0.0.0/0
+      # - PDNS_allow_query=0.0.0.0/0
+    depends_on:
+      - mariadb
 
   # pdns-recursor-mysql:
   #   container_name: pdns-recursor-mysql
@@ -138,19 +139,19 @@ services:
   #   volumes:
   #     - ./docker/bind/etc/bind:/etc/bind
 
-  # caddy:
-  #   image: caddy:2.10.2
-  #   container_name: caddy
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
-  #     - ./certs:/certs # your pre-generated existing TLS certs
-  #     - caddy_data:/data
-  #     - caddy_config:/config
+  caddy:
+    image: caddy:2.10.2
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./certs:/certs # your pre-generated existing TLS certs
+      - caddy_data:/data
+      - caddy_config:/config
 
   #   # extra_hosts: Required for Linux users
   #   extra_hosts:
   #         - "host.docker.internal:host-gateway"
-  #   restart: unless-stopped
+    restart: unless-stopped

@@ -1,4 +1,4 @@
-# Deploying Step CA and Bootstrapping the Root Certificate
+# Bootstrapping the Root Certificate using Step CA
 
 In this section, we set up **Step CA** as a **local private Certificate Authority (CA)** and establish trust on the host machine.
 
@@ -127,7 +127,7 @@ intermediate_ca.crt  root_ca.crt
 
 We will install **only the root CA**.
 
-## Step 5 — Install Root CA into OS Trust Store
+## Step 4 — Install Root CA into OS Trust Store
 
 ### Linux (Ubuntu / Debian)
 
