@@ -3,7 +3,7 @@
     errors
     etcd {
         path /skydns
-        endpoint http://etcd:2379
+        endpoint http://127.0.0.1:2379
         fallthrough
     }
     forward . 1.1.1.1:53

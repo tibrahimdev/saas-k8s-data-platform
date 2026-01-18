@@ -1,9 +1,39 @@
-# Install kind
+# Install Local Kubernetes Clusters
+
+## Using Minikube
+### Install Minikube
+Follow instruction on https://minikube.sigs.k8s.io/docs/start/.
+
+### Creating Minikube Clusters
+
+```bash
+# Creating SaaS cluster with named cluster "saas-minikube"
+minikube start -p saas-minikube
+
+# Creating SaaS cluster with named cluster "saas-minikube"
+# And adjust cpus memory limit
+minikube start -p saas-minikube --cpus=4 --memory=8192
+```
+
+On WSL2 (experimental - see [#5392](https://github.com/kubernetes/minikube/issues/5392)), you may need to run:
+```bash
+sudo mkdir /sys/fs/cgroup/systemd && sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+```
+
+### Deleting Minikube Cluster
+```bash
+minikube delete -p saas-minikube
+```
+
+---
+
+## Using Kind
+### Install kind
 
 ```bash
 go install sigs.k8s.io/kind@v0.31.0
 ```
-## Creating kind Cluster
+### Creating kind Cluster
 
 For example, let’s say you create two clusters:
 ```bash
@@ -37,7 +67,7 @@ To show current cluster + context that you're CLI working on:
 kubectl config current-context
 ```
 
-## Deleting a Cluster
+### Deleting a Kind Cluster
 If you created a cluster with kind create cluster then deleting is equally simple:
 ```bash
 kind delete cluster
@@ -46,7 +76,7 @@ If the flag `--name` is not specified, kind will use the default cluster context
 
 Note: By design, requesting to delete a cluster that does not exist will not return an error. This is intentional and is a means to have an idempotent way of cleaning up resources.
 
-## Loading an Image Into Your Cluster
+### Loading an Image Into Kind Cluster
 You can load one or more images into your kind cluster:
 ```bash
 kind load docker-image my-app:latest
