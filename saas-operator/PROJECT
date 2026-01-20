@@ -6,17 +6,6 @@ cliVersion: 4.10.1
 domain: tibrahim.dev
 layout:
 - go.kubebuilder.io/v4
-multigroup: true
 projectName: saas-operator
-repo: github.com/tibrahimdev/saas-operator
-resources:
-- api:
-    crdVersion: v1
-    namespaced: true
-  controller: true
-  domain: tibrahim.dev
-  group: platform
-  kind: DataPlatform
-  path: github.com/tibrahimdev/saas-operator/api/platform/v1alpha1
-  version: v1alpha1
+repo: github.com/tibrahim/saas-operator
 version: "3"

@@ -1,4 +1,4 @@
-module github.com/tibrahimdev/saas-operator
+module github.com/tibrahim/saas-operator
 
 go 1.24.6
 

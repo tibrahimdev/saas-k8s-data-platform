@@ -28,7 +28,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/tibrahimdev/saas-operator/test/utils"
+	"github.com/tibrahim/saas-operator/test/utils"
 )
 
 var (
