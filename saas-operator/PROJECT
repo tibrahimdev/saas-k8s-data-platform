@@ -6,6 +6,7 @@ cliVersion: 4.10.1
 domain: tibrahim.dev
 layout:
 - go.kubebuilder.io/v4
+multigroup: true
 projectName: saas-operator
 repo: github.com/tibrahim/saas-operator
 version: "3"
