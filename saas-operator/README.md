@@ -170,6 +170,18 @@ kubebuilder create api \
 kubebuilder create api --group platform --version v1beta1 --kind Workspace
 ```
 
+Testing
+```bash
+# Go library helps write integration tests for your controllers by setting up and starting an instance of etcd and the Kubernetes API server, without kubelet, controller-manager or other components
+# Step 1: download binaries
+make envtest
+
+# Step 2: run tests
+make test
+
+
+```
+
 ## License
 
 Copyright 2026.

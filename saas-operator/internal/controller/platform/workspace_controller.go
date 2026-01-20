@@ -18,11 +18,13 @@ package platform
 
 import (
 	"context"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	logf "sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	platformv1beta1 "github.com/tibrahim/saas-operator/api/platform/v1beta1"
 )
@@ -47,11 +49,54 @@ type WorkspaceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.22.4/pkg/reconcile
 func (r *WorkspaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = logf.FromContext(ctx)
+	log := log.FromContext(ctx)
+	log.Info("Reconciling workspace", "workspace", req.NamespacedName)
 
-	// TODO(user): your logic here
+	ws := &platformv1beta1.Workspace{}
+	workspaceFinalizer := "workspace.platform.tibrahim.dev/finalizer"
 
-	return ctrl.Result{}, nil
+	// get
+	if err := r.Get(ctx, req.NamespacedName, ws); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	if ws.ObjectMeta.DeletionTimestamp.IsZero() {
+		// The object is not being deleted, so if it does not have our finalizer, then let's add the finalizer and update the object. This is equivalent to registering our finalizer.
+		if !controllerutil.ContainsFinalizer(ws, workspaceFinalizer) {
+			controllerutil.AddFinalizer(ws, workspaceFinalizer)
+			if err := r.Update(ctx, ws); err != nil {
+				return ctrl.Result{}, err
+			}
+			return ctrl.Result{}, nil
+		}
+	} else {
+		// The object is being deleted
+		if controllerutil.ContainsFinalizer(ws, workspaceFinalizer) {
+			log.Info("Deleting workspace", "workspace", req.NamespacedName)
+			// TODO: delete/cleanup logic
+		}
+
+		// remove finalizer from the list and update it
+		controllerutil.RemoveFinalizer(ws, workspaceFinalizer)
+		if err := r.Update(ctx, ws); err != nil {
+			return ctrl.Result{}, err
+		}
+	}
+
+	// remote, err := poll saas
+	// if err:
+	// 	requeue with backoff
+	// 	return
+
+	// changed := sync status
+	// if changed:
+	// 	update status
+
+	// requeue after interval
+
+	return ctrl.Result{
+		RequeueAfter: 10 * time.Second,
+	}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
