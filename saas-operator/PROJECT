@@ -9,4 +9,14 @@ layout:
 multigroup: true
 projectName: saas-operator
 repo: github.com/tibrahim/saas-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: tibrahim.dev
+  group: platform
+  kind: Workspace
+  path: github.com/tibrahim/saas-operator/api/platform/v1beta1
+  version: v1beta1
 version: "3"
