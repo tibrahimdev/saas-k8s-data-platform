@@ -1,0 +1,19 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: helm-valkey
+spec:
+  components:
+    - name: valkey
+      type: helm
+      properties:
+        repoType: "oci"
+        url: "oci://registry-1.docker.io/cloudpirates"
+        chart: "valkey"
+        version: "0.15.1"
+        targetNamespace: "myapp"
+        values:
+          auth:
+            enabled: false
+          config:
+            maxMemory: "256mb"

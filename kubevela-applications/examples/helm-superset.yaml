@@ -1,0 +1,17 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: helm-superset
+spec:
+  components:
+    - name: superset
+      type: helm
+      properties:
+        repoType: "helm"
+        url: "https://apache.github.io/superset"
+        chart: "superset"
+        version: "0.15.0"
+        targetNamespace: "myapp"
+        values:
+          postgresql:
+            enabled: false
