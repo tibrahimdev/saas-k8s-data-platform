@@ -1,0 +1,18 @@
+name: canary-rollout-istio
+version: 1.0.2
+description: Enable service mash and managing triffic shiffting in workflow.
+icon: https://github.com/istio/istio/raw/master/logo/istio-bluelogo-whitebackground-unframed.svg
+url: https://istio.io/
+
+tags:
+- service-mesh
+- rollout
+
+deployTo:
+  control_plane: true
+  runtime_cluster: true
+
+dependencies:
+- name: istio
+- name: rollout
+

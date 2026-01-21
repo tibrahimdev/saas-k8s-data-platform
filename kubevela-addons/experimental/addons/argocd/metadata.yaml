@@ -1,0 +1,20 @@
+name: argocd
+version: 0.1.0
+description: "Declarative continuous deployment for Kubernetes."
+icon: "https://argo-cd.readthedocs.io/en/stable/assets/logo.png"
+url: "https://github.com/argoproj/argo-cd"
+
+tags:
+  - argocd
+  - gitops
+  - v2.3.3
+  - helm_support
+
+deployTo:
+  control_plane: true
+  runtime_cluster: true
+
+needNamespace:
+  - argocd
+
+invisible: false

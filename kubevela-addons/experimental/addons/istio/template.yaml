@@ -1,0 +1,31 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: istio
+  namespace: vela-system
+spec:
+  workflow:
+    steps:
+      - name: apply-ns
+        type: apply-component
+        properties:
+          component: ns-istio-system
+      - name: apply-resources
+        type: apply-remaining
+  components:
+    - name: ns-istio-system
+      type: k8s-objects
+      properties:
+        objects:
+          - kind: Namespace
+            apiVersion: v1
+            metadata:
+              name: istio-system
+    - name: istio
+      type: helm
+      properties:
+        repoType: helm
+        url: https://charts.kubevela.net/addons
+        chart: istio
+        version: 1.11.1
+        targetNamespace: istio-system

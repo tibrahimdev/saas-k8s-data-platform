@@ -1,0 +1,42 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: kruise
+  namespace: vela-system
+spec:
+  workflow:
+    steps:
+      - name: apply-resources
+        type: apply-application
+  components:
+    - name: kruise
+      type: helm
+      properties:
+        repoType: helm
+        url: https://openkruise.github.io/charts/
+        chart: kruise
+        version: 1.2.0
+        git:
+          branch: master
+        values:
+          featureGates: PreDownloadImageForInPlaceUpdate=true
+    - name: resource-relation
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: clone-set-relation
+              namespace: vela-system
+              labels:
+                "rules.oam.dev/resources": "true"
+            data:
+              rules: |-
+                - parentResourceType:
+                    group: apps.kruise.io
+                    kind: CloneSet
+                  childrenResourceType:
+                    - apiVersion: v1
+                      kind: Pod
+

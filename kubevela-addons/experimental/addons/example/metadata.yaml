@@ -1,0 +1,15 @@
+name: example
+version: 1.2.0
+description: gateway for serving ingress traffic
+
+tags:
+  - only_example
+
+dependencies:
+  - name: fluxcd
+
+deployTo:
+  runtimeCluster: true
+
+uxPlugins:
+  node-dashboard: "https://kubevela-assets.oss-cn-beijing.aliyuncs.com/node-dashboard.tar.gz"
