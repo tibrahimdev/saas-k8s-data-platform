@@ -1,94 +1,32 @@
 # Setting Up Local DNS
 
-This guide describes the architecture and concept for setting up local DNS + trusted HTTPS for any local Kubernetes cluster (k3s, kind, k3d) using a single private Certificate Authority (CA).
+This guide describes how to implement the Local DNS part.
 
-Instead of ad-hoc certificates (mkcert, self-signed per service), we use Step CA to:
-- Create one trusted root CA
-- Issue multiple TLS certificates automatically
-- Reuse the same trust chain across:
-  - Kubernetes Ingress
-  - Reverse proxies
-  - Local development tools
-  - Browsers on Windows/macOS/Linux
+At the end of this section we will have (but not limited to):
+- saas.test
+- app.saas.test
+- api.saas.test
+- harbor.saas.test
+
+Can be resolved locally from host machine and containers.
 
 ## Run The Services
 
 Start the services using `docker compose up`.
 ```bash
-sudo docker compose up -d
+docker compose up -d
 ```
 
-Check the services
-```bash
-sudo docker compose ps
-NAME                IMAGE                            COMMAND                  SERVICE             CREATED          STATUS                             PORTS
-pdns-mariadb        mariadb:lts-ubi                  "docker-entrypoint.s…"   mariadb             13 seconds ago   Up 12 seconds (health: starting)   3306/tcp
-pdns-mysql-master   pschiffe/pdns-mysql:5.0-alpine   "/docker-entrypoint.…"   pdns-mysql-master   13 seconds ago   Up 11 seconds (health: starting)   0.0.0.0:53->53/tcp, :::53->53/tcp, 0.0.0.0:8081->8081/tcp, 0.0.0.0:53->53/udp, :::8081->8081/tcp, :::53->53/udp
-step-ca             smallstep/step-ca:latest         "/bin/bash /entrypoi…"   step-ca             25 minutes ago   Up 15 minutes (unhealthy)          0.0.0.0:9000->9000/tcp, :::9000->9000/tcp
-```
+The running services are:
 
-Check Step CA health:
-```bash
-curl -k https://localhost:9000/health
-```
+### CoreDNS
+- Runing on `network_mode: host` on host's port 53.
+- Depends on `etcd` service which is defined on the same `docker-compose.yml`
+- Using Corefile which is mounted from `docker/coredns/Corefile`
 
-Expected output:
-```json
-{"status":"ok"}
-```
-
-## Setting Up PowerDNS
-Assumptions (adjust if needed):
-- Zone: saas.test
-- Authoritative server container IP: 172.30.0.20
-
-### Get into pdns container shell
-```bash
-sudo docker exec -it pdns-mysql-master sh
-```
-
-```bash
-# List all zones
-pdnsutil list-all-zones
-# Delete existing zone (if exists)
-pdnsutil delete-zone saas.test
-# Add zone
-pdnsutil create-zone saas.test
-# Update SOA
-pdnsutil replace-rrset saas.test saas.test SOA "ns1.saas.test. hostmaster.saas.test. 1 10800 3600 604800 3600"
-
-pdnsutil add-record saas.test saas.test NS ns1.saas.test.
-
-pdnsutil add-record saas.test ns1.saas.test A 172.30.0.20
-
-# Check zone
-pdnsutil check-zone saas.test
-# Should output:
-# Checked 3 records of 'saas.test', 0 errors, 0 warnings.
-```
-
-Add Step CA record to PowerDNS.
-```
-# List added zone
-pdnsutil list-zone saas.test
-# Add record
-pdnsutil add-record saas.test ca.saas.test A 192.168.1.7
-# Delete record if needed
-pdnsutil delete-rrset saas.test ca.saas.test A
-# Replace record with new IP
-pdnsutil replace-rrset saas.test ca.saas.test A 192.168.1.3
-```
-
-Now Step CA can be accessed with valid HTTPS on https://ca.saas.test:9000.
-
-
-
-This mirrors how HTTPS works in real production environments.
-
-* **PowerDNS** – authoritative DNS (`*.saas.test`)
-* **ExternalDNS (RFC2136)** – automatic DNS records from Kubernetes
-* **Caddy**
-* **Windows/macOS/Linux compatible**
+### Step CA
+- Runing on `network_mode: host` on host's port 9000.
+- Accessible on https://localhost:9000 and https://ca.saas.test:9000
 
 
 ## Note on WSL

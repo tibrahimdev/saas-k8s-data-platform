@@ -1,4 +1,4 @@
-name: saas_k8s
+name: saas
 
 networks:
   pdns:
@@ -15,17 +15,66 @@ volumes:
   pdns-data:
 
 services:
-  # step-ca:
-  #   image: smallstep/step-ca:latest
-  #   container_name: step-ca
-  #   networks:
-  #     pdns:
-  #       ipv4_address: 172.30.0.22
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.7
+    container_name: etcd
+    network_mode: host
+    environment:
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    restart: always
+
+  coredns:
+    image: coredns/coredns
+    container_name: coredns
+    network_mode: host
+    command: -conf /etc/coredns/Corefile
+    volumes:
+      - ./docker/coredns:/etc/coredns
+    environment:
+      - GOMAXPROCS=8
+    restart: always
+    depends_on:
+      - etcd
+
+  step-ca-init:
+    image: smallstep/step-ca:latest
+    container_name: step-ca-init
+    profiles: ["init"]  # <--- This hides it from normal 'up'
+    network_mode: host
+    command: >
+      step ca init --name 'Local SaaS CA'
+      --provisioner admin
+      --dns localhost
+      --dns ca.saas.test
+      --address ':9000'
+      --issuer https://ca.saas.test:9000
+      --acme
+      --password-file /home/step/secrets/password
+    volumes:
+      - ./docker/step-ca:/home/step
+
+  step-ca:
+    image: smallstep/step-ca:latest
+    container_name: step-ca
+    network_mode: host
   #   ports:
   #     - "9000:9000"
-  #   volumes:
-  #     - ./_data/step-ca:/home/step
-  #   restart: always
+    volumes:
+      - ./docker/step-ca:/home/step
+
+  caddy:
+    image: caddy:2.10.2
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./docker/step-ca/certs:/step-ca-certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: always
 
   # mariadb:
   #   container_name: pdns-mariadb
@@ -111,40 +160,6 @@ services:
   #   #   - pdns-mysql-master
   #   restart: always
 
-  etcd:
-    image: quay.io/coreos/etcd:v3.5.7
-    container_name: etcd
-    network_mode: host
-    # networks:
-    #   pdns:
-    #     ipv4_address: 172.30.0.24
-    environment:
-      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
-    restart: always
-    # ports:
-    #   - "2379:2379"
-    #   - "2380:2380"
-
-  coredns:
-    image: coredns/coredns
-    container_name: coredns
-    network_mode: host
-    # networks:
-    #   pdns:
-    #     ipv4_address: 172.30.0.25
-    # ports:
-    #   - 53:53/udp
-    #   - 53:53/tcp
-    command: -conf /etc/coredns/Corefile
-    volumes:
-      - ./docker/coredns:/etc/coredns
-    environment:
-      - GOMAXPROCS=8
-    restart: always
-    depends_on:
-      - etcd
-
   # netshoot:
   #   image: nicolaka/netshoot:latest
   #   container_name: netshoot
@@ -166,16 +181,3 @@ services:
   #     - "53:53/udp"
   #   volumes:
   #     - ./docker/bind/etc/bind:/etc/bind
-
-  # caddy:
-  #   image: caddy:2.10.2
-  #   container_name: caddy
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile
-  #     - ./certs:/certs # your pre-generated existing TLS certs
-  #     - caddy_data:/data
-  #     - caddy_config:/config
-  #   restart: always

@@ -1,14 +1,29 @@
-saas.local {
-	respond "HTTPS OK"
+saas.test {
+	respond "HTTPS OK saas.test"
 	tls internal
 }
 
-api.saas.local {
-	respond "HTTPS OK"
+ca.saas.test {
+	# respond "HTTPS OK saas.test"
+	tls internal
+	reverse_proxy 127.0.0.1:9000
+}
+
+api.saas.test {
+	respond "HTTPS OK api.saas.test"
 	tls internal
 }
 
-myservice.saas.local {
-	respond "HTTPS OK"
-	tls internal
+ui.saas.test {
+	respond "HTTPS OK ui.saas.test"
+	# tls internal
+	tls {
+		issuer acme {
+			# The internal URL of your step-ca container
+			dir https://ca.saas.test:9000/acme/acme/directory
+
+			# Caddy MUST trust the step-ca root certificate to talk to it
+			trusted_roots /step-ca-certs/root_ca.crt
+		}
+	}
 }

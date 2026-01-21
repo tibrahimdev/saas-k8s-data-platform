@@ -1,10 +1,26 @@
-. {
+saas.test {
     log
     errors
+
+    hosts {
+        192.168.1.5 ca.saas.test
+        192.168.1.5 ui.saas.test
+        fallthrough
+    }
+
+    # We use the /skydns path to stay compatible with external-dns
     etcd {
         path /skydns
         endpoint http://127.0.0.1:2379
-        fallthrough
     }
+    # This allows CoreDNS to respond to the cluster even if 
+    # a specific record isn't in etcd yet
+    # fallthrough
+}
+
+. {
+    log
+    errors
     forward . 1.1.1.1:53
+    cache 30
 }

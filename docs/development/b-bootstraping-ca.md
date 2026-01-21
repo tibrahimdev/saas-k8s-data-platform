@@ -36,19 +36,20 @@ By the end of this section:
 
 Create a working directory:
 ```bash
-# ! _data directory is ignored by .gitignore
-mkdir -p _data/step-ca/secrets
+# ! docker/step-ca directory is ignored by .gitignore
+mkdir -p docker/step-ca/secrets
 ```
 
 Create step-ca password file. Change the password as you need.
 ```bash
 # Create the password file
-echo "password" > _data/step-ca/secrets/password
-```
+read -rs PASSWORD
 
-Update directory ownership
-```bash
-sudo chown -R 1000:1000 _data/step-ca
+# Then write
+echo "$PASSWORD" > docker/step-ca/secrets/password
+
+# Update directory ownership
+sudo chown -R 1000:1000 docker/step-ca
 ```
 
 ## Step 2 — Initialize the Certificate Authority
@@ -62,100 +63,52 @@ We will initialize Step CA **inside the container**.
 
 Run:
 ```bash
-sudo docker compose run --rm step-ca step ca init
+docker compose run --rm step-ca-init
 ```
 
-You will be given some prompts. Use following table as references
-
-| Prompt | Example value |
-| --- | --- |
-| Deployment Type | Standalone |
-| What would you like to name your new PKI? | saas-local-ca |
-| What DNS names or IP addresses will clients use to reach your CA? | step-ca.saas.test |
-| What IP and port will your new CA bind to? (:443 will bind to 0.0.0.0:443) | :9000 |
-| What would you like to name the CA's first provisioner | admin |
-| Choose a password for your CA keys and first provisioner | your-password-created-in-step-1 |
-
-
-This command generates:
-- Root certificate: /home/step/certs/root_ca.crt
-- Root private key: /home/step/secrets/root_ca_key
-- Root fingerprint: 
-- Intermediate certificate: /home/step/certs/intermediate_ca.crt
-- Intermediate private key: /home/step/secrets/intermediate_ca_key
-- Database folder: /home/step/db
-- Default configuration: /home/step/config/defaults.json
-- Certificate Authority configuration: /home/step/config/ca.json
-
-All data is stored in `_data/step-ca` directory.
+All data generated is stored in `docker/step-ca` directory.
 ```bash
-_data/
-└── step-ca
-    ├── certs
-    │   ├── intermediate_ca.crt
-    │   └── root_ca.crt
-    ├── config
-    │   ├── ca.json
-    │   └── defaults.json
-    ├── db
-    │   ├── 000000.vlog
-    │   ├── 000002.sst
-    │   ├── KEYREGISTRY
-    │   └── MANIFEST
-    ├── secrets
-    │   ├── intermediate_ca_key
-    │   ├── password
-    │   └── root_ca_key
-    └── templates
-```
-
-## Step 3 — Extract the Root CA Certificate
-
-The root certificate must be installed on your machine.
-
-Copy it out of the container volume data:
-
-```bash
-ls _data/step-ca/certs/
-```
-
-You should see something like:
-
-```
-intermediate_ca.crt  root_ca.crt
+./docker/step-ca/
+├── certs
+│   ├── intermediate_ca.crt        # Intermediate certificate
+│   └── root_ca.crt                # Root certificate
+├── config
+│   ├── ca.json                    # Certificate Authority configuration
+│   └── defaults.json              # Default configuration
+├── db                             # Database folder
+├── secrets
+│   ├── intermediate_ca_key        # Intermediate private key
+│   ├── password
+│   └── root_ca_key                # Root private key
+└── templates
 ```
 
 We will install **only the root CA**.
 
-## Step 4 — Install Root CA into OS Trust Store
+## Step 3 — Install Root CA into OS Trust Store
 
 ### Linux (Ubuntu / Debian)
 
 ```bash
-sudo cp _data/step-ca/certs/root_ca.crt /usr/local/share/ca-certificates/saas-local-ca.crt
+sudo cp docker/step-ca/certs/root_ca.crt /usr/local/share/ca-certificates/saas-test-ca.crt
 sudo update-ca-certificates --fresh
 ```
 
 Verify:
-
 ```bash
-openssl verify /usr/local/share/ca-certificates/saas-local-ca.crt
+sudo openssl verify /usr/local/share/ca-certificates/saas-test-ca.crt
 ```
 
 ### macOS
-
 ```bash
 sudo security add-trusted-cert \
   -d -r trustRoot \
   -k /Library/Keychains/System.keychain \
-  _data/step-ca/certs/root_ca.crt
+  docker/step-ca/certs/root_ca.crt
 ```
 
----
-
 ### Windows
-
-1. Download or copy `_data/step-ca/certs/root_ca.crt` into Windows folder.
+1. Copy `docker/step-ca/certs/root_ca.crt` into Windows folder.
 2. Double-click `root_ca.crt`
 3. Install Certificate
 4. Choose **Local Machine**
@@ -166,16 +119,8 @@ sudo security add-trusted-cert \
 
 At this point:
 
-* ✅ Step CA is running
-* ✅ Root CA is trusted system-wide
+* ✅ Root CA generated and is trusted system-wide
 * ✅ Ready to issue unlimited certificates
 
 ## Next
-
-➡️ **Configuring PowerDNS as the Authoritative DNS for `saas.test`**
-
-Next, we will:
-
-* Deploy PowerDNS
-* Create the `saas.test` zone
-* Prepare it for ExternalDNS (RFC2136)
+- **Set Up Local DNS for `saas.test`**

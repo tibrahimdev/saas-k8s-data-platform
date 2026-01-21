@@ -6,3 +6,4 @@ certs/
 
 # Local docker data
 _data/
+docker/step-ca

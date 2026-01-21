@@ -9,8 +9,11 @@ The goal is not step-by-step setup, but to explain **how the pieces fit together
 
 The architecture is built from the following roles:
 
-- **PowerDNS (Authoritative)**  
-  Owns the `saas.test` DNS zone and serves authoritative DNS records.
+- **CoreDNS**  
+  Owns the local `saas.test` DNS zone and serves authoritative DNS records.
+
+- **Step CA**  
+  Perform certificate management and root certificate creation.
 
 - **external-dns (RFC2136)**  
   Observes Kubernetes resources and automatically creates DNS records in PowerDNS.
