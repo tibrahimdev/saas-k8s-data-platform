@@ -42,6 +42,7 @@ echo "Installing kubevela..."
 vela install --version ${KUBEVELA_VERSION}
 vela addon enable velaux
 vela addon enable fluxcd
+vela addon enable chartmuseum
 
 # echo "Installing ${DEPLOYMENT}..."
 

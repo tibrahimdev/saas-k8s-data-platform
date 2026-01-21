@@ -1,0 +1,14 @@
+name: saas-data-platform
+description: SaaS data platform addon for KubeVela.
+icon: ""
+invisible: false
+tags:
+  - data-platform
+deployTo:
+  control_plane: true
+dependencies:
+- name: fluxcd
+system:
+  vela: ">=v1.6.0-alpha.6"
+  kubernetes: ">=1.19"
+version: 1.0.0
