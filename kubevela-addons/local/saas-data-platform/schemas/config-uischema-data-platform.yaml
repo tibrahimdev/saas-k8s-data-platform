@@ -6,7 +6,7 @@
   label: Namespace
   validate:
     required: true
-    defaultValue: default-workspace
+    defaultValue: saas
 - jsonKey: workspaceExtId
   sort: 10
 - jsonKey: BOOTSTRAP_TOKEN

@@ -6,5 +6,16 @@
 // container images, ports, and etc.
 parameter: {
 	// +usage=Custom parameter description
-	namespace: *"w-123456" | string
+	namespace: *"saas" | string
+	//+usage=Cert Manager config
+	certManager: {
+		//+usage=Namespace to deploy to, defaults to saas
+		namespace: *"saas" | string
+		// +usage=Specify if install the CRDs before installing cert-manager or not
+		installCRDs: *true | bool
+		// +usage=Specify if upgrade the CRDs when upgrading cert-manager or not
+		upgradeCRD: *false | bool
+		//+usage=Number of replicas
+		replicas: *1 | int
+	}
 }
