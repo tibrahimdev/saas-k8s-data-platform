@@ -6,5 +6,5 @@
 // container images, ports, and etc.
 parameter: {
 	// +usage=Custom parameter description
-	namespace: *"workspace-default" | string
+	namespace: *"w-123456" | string
 }
