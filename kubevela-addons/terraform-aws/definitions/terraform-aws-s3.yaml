@@ -1,0 +1,47 @@
+apiVersion: core.oam.dev/v1beta1
+kind: ComponentDefinition
+metadata:
+  name: aws-s3
+  namespace: vela-system
+  annotations:
+    definition.oam.dev/description: Terraform configuration for AWS S3
+  labels:
+    type: terraform
+spec:
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+  schematic:
+    terraform:
+      configuration: |
+        terraform {
+          required_providers {
+            aws = {
+              source = "hashicorp/aws"
+              version = "3.74.3"
+            }
+          }
+        }
+
+        resource "aws_s3_bucket" "bucket-acl" {
+          bucket = var.bucket
+          acl    = var.acl
+        }
+        output "BUCKET_NAME" {
+          description = "Bucket name"
+          value = aws_s3_bucket.bucket-acl.bucket_domain_name
+        }
+        variable "bucket" {
+          description = "S3 bucket name"
+          type        = string
+        }
+        variable "acl" {
+          description = "S3 bucket ACL"
+          default     = "private"
+          type        = string
+        }
+
+      providerRef:
+        name: aws
+        namespace: default

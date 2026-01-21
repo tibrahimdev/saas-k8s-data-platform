@@ -1,0 +1,19 @@
+name: terraform-aws
+version: 1.0.3
+description: Kubernetes Terraform Controller for AWS
+icon: https://static.kubevela.net/images/logos/aws.png
+url: https://registry.terraform.io/providers/hashicorp/aws/latest
+
+tags:
+  - Terraform Provider
+  - Cloud Resource
+
+deployTo:
+  control_plane: true
+  runtime_cluster: false
+
+dependencies:
+- name: terraform
+
+system:
+  vela: ">=v1.6.0-alpha.6"

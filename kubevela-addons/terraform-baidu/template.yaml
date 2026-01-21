@@ -1,0 +1,16 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: terraform-baidu
+  namespace: vela-system
+spec:
+  components:
+    - name: addon-terraform-baidu
+      type: k8s-objects
+      properties:
+        objects:
+          - kind: ConfigMap
+            apiVersion: v1
+            metadata:
+              name: addon-terraform-baidu
+              namespace: vela-system

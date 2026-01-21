@@ -1,0 +1,19 @@
+name: terraform-tencent
+version: 1.0.4
+description: Kubernetes Terraform Controller Provider for Tencent Cloud
+icon: https://avatars3.githubusercontent.com/tencentcloud
+url: https://registry.terraform.io/providers/tencentcloudstack/tencentcloud/latest
+
+tags:
+  - Terraform Provider
+  - Cloud Resource
+
+deployTo:
+  control_plane: true
+  runtime_cluster: false
+
+dependencies:
+  - name: terraform
+
+system:
+  vela: ">=v1.6.0-alpha.6"

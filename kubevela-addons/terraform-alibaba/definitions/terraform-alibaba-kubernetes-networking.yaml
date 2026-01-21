@@ -1,0 +1,21 @@
+apiVersion: core.oam.dev/v1beta1
+kind: ComponentDefinition
+metadata:
+  annotations:
+    definition.oam.dev/description: Create a set of network environment related resources
+      for Kubernetes clusters on AliCloud based on Terraform module
+  creationTimestamp: null
+  labels:
+    type: terraform
+  name: alibaba-kubernetes-networking
+  namespace: vela-system
+spec:
+  schematic:
+    terraform:
+      configuration: https://github.com/terraform-alicloud-modules/terraform-alicloud-kubernetes-networking.git
+      type: remote
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+status: {}

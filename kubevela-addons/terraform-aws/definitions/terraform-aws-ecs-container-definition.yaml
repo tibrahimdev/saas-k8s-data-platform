@@ -1,0 +1,25 @@
+apiVersion: core.oam.dev/v1beta1
+kind: ComponentDefinition
+metadata:
+  annotations:
+    definition.oam.dev/description: Terraform module to generate well-formed JSON
+      documents (container definitions) that are passed to the  aws_ecs_task_definition
+      Terraform resource
+  creationTimestamp: null
+  labels:
+    type: terraform
+  name: aws-ecs-container-definition
+  namespace: vela-system
+spec:
+  schematic:
+    terraform:
+      configuration: https://github.com/cloudposse/terraform-aws-ecs-container-definition.git
+      providerRef:
+        name: aws
+        namespace: default
+      type: remote
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+status: {}

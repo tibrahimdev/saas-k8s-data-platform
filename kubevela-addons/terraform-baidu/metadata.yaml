@@ -1,0 +1,18 @@
+name: terraform-baidu
+version: 1.0.3
+description: Kubernetes Terraform Controller Provider for Baidu Cloud
+url: https://github.com/oam-dev/terraform-controller
+
+tags:
+  - Terraform Provider
+  - Cloud Resource
+
+deployTo:
+  control_plane: true
+  runtime_cluster: false
+
+dependencies:
+  - name: terraform
+
+system:
+  vela: ">=v1.6.0-alpha.6"

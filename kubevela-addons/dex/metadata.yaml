@@ -1,0 +1,15 @@
+name: dex
+version: 0.7.0
+description: Enable dex for login
+icon: https://raw.githubusercontent.com/cncf/artwork/master/projects/dex/horizontal/color/dex-horizontal-color.png
+
+tags:
+- Official
+- OAuth
+
+dependencies:
+  - name: velaux
+  - name: fluxcd
+
+system:
+  vela: ">=v1.6.0-alpha.6"

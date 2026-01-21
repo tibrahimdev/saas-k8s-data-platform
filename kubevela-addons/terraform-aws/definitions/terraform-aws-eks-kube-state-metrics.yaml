@@ -1,0 +1,23 @@
+apiVersion: core.oam.dev/v1beta1
+kind: ComponentDefinition
+metadata:
+  annotations:
+    definition.oam.dev/description: AWS Eks-Kube-State-Metrics
+  creationTimestamp: null
+  labels:
+    type: terraform
+  name: aws-eks-kube-state-metrics
+  namespace: vela-system
+spec:
+  schematic:
+    terraform:
+      configuration: https://github.com/lablabs/terraform-aws-eks-kube-state-metrics.git
+      providerRef:
+        name: aws
+        namespace: default
+      type: remote
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+status: {}

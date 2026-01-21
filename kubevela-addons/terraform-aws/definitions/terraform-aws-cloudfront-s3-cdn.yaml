@@ -1,0 +1,24 @@
+apiVersion: core.oam.dev/v1beta1
+kind: ComponentDefinition
+metadata:
+  annotations:
+    definition.oam.dev/description: Terraform module to easily provision CloudFront
+      CDN backed by an S3 origin
+  creationTimestamp: null
+  labels:
+    type: terraform
+  name: aws-cloudfront-s3-cdn
+  namespace: vela-system
+spec:
+  schematic:
+    terraform:
+      configuration: https://github.com/cloudposse/terraform-aws-cloudfront-s3-cdn.git
+      providerRef:
+        name: aws
+        namespace: default
+      type: remote
+  workload:
+    definition:
+      apiVersion: terraform.core.oam.dev/v1beta1
+      kind: Configuration
+status: {}
