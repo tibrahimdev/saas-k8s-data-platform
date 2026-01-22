@@ -1,0 +1,36 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: {{ .Values.prefix }}-protect-namespaces
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["DELETE"]
+        resources: ["namespaces"]
+  validations:
+    - expression: >
+        !(
+          (
+            object.metadata.labels['platform.role'] == "system"
+            && object.metadata.labels['platform.protected'] == "true"
+            {{- if .Values.breakGlassEnabled }}
+            && object.metadata.labels['platform.breakglass'] != "true"
+            {{- end }}
+          )
+          ||
+          (
+            object.metadata.labels['platform.role'] == "workload"
+            && object.metadata.labels['platform.protected'] == "true"
+            {{- if .Values.breakGlassEnabled }}
+            && object.metadata.labels['platform.breakglass'] != "true"
+            {{- end }}
+          )
+        )
+      message: >
+        Protected namespaces cannot be deleted.
+        {{- if .Values.breakGlassEnabled }}
+        To delete, explicitly set platform.breakglass=true.
+        {{- end }}

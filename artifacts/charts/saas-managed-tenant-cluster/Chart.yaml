@@ -1,0 +1,6 @@
+apiVersion: v2
+name: managed-tenant-cluster
+description: "Bootstrap SaaS-managed tenant cluster with protected system namespace"
+type: application
+version: 0.0.1
+appVersion: "0.0.1"

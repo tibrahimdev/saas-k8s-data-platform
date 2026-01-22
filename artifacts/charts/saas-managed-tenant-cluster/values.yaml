@@ -1,0 +1,5 @@
+# Namespace prefix
+prefix: saas
+
+# Whether break-glass is enabled
+breakGlassEnabled: false
