@@ -14,7 +14,7 @@ fi
 DEFAULT_BRANDING=saas
 DEFAULT_WORKSPACE=workspace
 DEFAULT_MANIFEST_URL="https://saas.test/manifests/cluster-bootstrap-0.0.1.yaml"
-KUBEVELA_VERSION=1.10.6
+DEFAULT_KUBEVELA_HELM_URI=https://saas.test/charts/vela-core-1.10.6-saas.1.tgz
 
 # ---- preflight ----
 echo "Prerequisite checks:"
@@ -42,6 +42,8 @@ MANIFEST_URL="${1:-${MANIFEST_URL:-$DEFAULT_MANIFEST_URL}}"
 
 SYSTEM_NAMESPACE="${BRANDING}-system"
 WORKLOAD_NAMESPACE="${BRANDING}-workload"
+KUBEVELA_SYSTEM_NAMESPACE=vela-system
+
 # TIMEOUT="120s"
 
 echo "--------------------"
@@ -55,14 +57,18 @@ echo "--------------------"
 echo "Setting up namespaces..."
 curl -sSL https://saas.test/manifests/cluster-bootstrap-0.0.1.yaml | kubectl apply -f -
 
-# echo "Installing kubevela..."
-# vela install --version ${KUBEVELA_VERSION} --namespace $SYSTEM_NAMESPACE
+# Install KubeVela
+# Allow user to answer n, but continue
+echo "Installing KubeVela control plane..."
+if ! vela install -f $DEFAULT_KUBEVELA_HELM_URI -n $KUBEVELA_SYSTEM_NAMESPACE; then
+  echo "KubeVela installation skipped (existing installation preserved). Continuing bootstrap..."
+fi
 
-# echo "Installing addon velaux..."
-# vela addon enable velaux
+echo "Installing addon velaux..."
+vela addon enable velaux 
 
-# echo "Installing addon fluxcd..."
-# vela addon enable fluxcd
+echo "Installing addon fluxcd..."
+vela addon enable fluxcd namespace=$SYSTEM_NAMESPACE
 
 # echo "Installing addon chartmuseum..."
 # vela addon enable chartmuseum

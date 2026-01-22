@@ -3,12 +3,37 @@ entries:
   managed-tenant-cluster:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2026-01-22T14:35:38.413365291+07:00"
+    created: "2026-01-22T19:32:49.315363922+07:00"
     description: Bootstrap SaaS-managed tenant cluster with protected system namespace
-    digest: c794b078aee86eb3cb5539d5f4b81a1832ca165bde4f400c0142be84c44d6409
+    digest: fb4d7bdc76c149253e8edc8fd318b4ec6cfcb491c3e6a51e5394e301e23d32aa
     name: managed-tenant-cluster
     type: application
     urls:
     - https://saas.test/charts/managed-tenant-cluster-0.0.1.tgz
     version: 0.0.1
-generated: "2026-01-22T14:35:38.412895152+07:00"
+  vela-core:
+  - apiVersion: v2
+    appVersion: 1.10.6-saas.1
+    created: "2026-01-22T19:32:49.330482454+07:00"
+    description: A Helm chart for KubeVela core
+    digest: 3a482010c3be887eac3de9b671f29cad7507d57ae1c9a7746bf409bae2004e98
+    home: https://kubevela.io
+    icon: https://kubevela.io/img/logo.svg
+    name: vela-core
+    type: application
+    urls:
+    - https://saas.test/charts/vela-core-1.10.6.tgz
+    version: 1.10.6
+  - apiVersion: v2
+    appVersion: 1.10.6
+    created: "2026-01-22T19:32:49.323878228+07:00"
+    description: A Helm chart for KubeVela core
+    digest: 3d92932a9a2655646b5d5a8d9514cd4620ef83055f039bd87bbf695b7f39eea3
+    home: https://kubevela.io
+    icon: https://kubevela.io/img/logo.svg
+    name: vela-core
+    type: application
+    urls:
+    - https://saas.test/charts/vela-core-1.10.6-saas.1.tgz
+    version: 1.10.6-saas.1
+generated: "2026-01-22T19:32:49.313637668+07:00"
