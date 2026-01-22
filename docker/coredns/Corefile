@@ -3,9 +3,9 @@ saas.test {
     errors
 
     hosts {
-        192.168.1.5 ca.saas.test
-        192.168.1.5 docs.saas.test
-        192.168.1.5 ui.saas.test
+        {$HOST_IP} ca.saas.test
+        {$HOST_IP} docs.saas.test
+        {$HOST_IP} ui.saas.test
         fallthrough
     }
 

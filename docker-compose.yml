@@ -46,8 +46,11 @@ services:
     command: -conf /etc/coredns/Corefile
     volumes:
       - ./docker/coredns:/etc/coredns
-    environment:
-      - GOMAXPROCS=8
+    # environment:
+    #   - GOMAXPROCS=8
+    #   - HOST_IP=${MY_LOCAL_IP}
+    env_file:
+      - .env.example
     restart: always
     depends_on:
       - etcd
