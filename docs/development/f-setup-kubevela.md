@@ -18,12 +18,7 @@ Now we need to install KubeVela Core into the Kubernetes cluster.
 
 ```bash
 export KUBEVELA_VERSION=1.10.6
-vela install --version ${KUBEVELA_VERSION} \
-  --set nodeSelector.NodeGroupType=core \
-  --set "tolerations[0].key=workload" \
-  --set "tolerations[0].operator=Equal" \
-  --set "tolerations[0].value=core" \
-  --set "tolerations[0].effect=NoSchedule"
+vela install --version ${KUBEVELA_VERSION}
 ```
 
 ## Install VelaUX and other addons

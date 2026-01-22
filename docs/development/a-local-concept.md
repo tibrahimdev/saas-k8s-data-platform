@@ -1,11 +1,25 @@
-# Conceptual Architecture: Local DNS and HTTPS (Prod-Like)
+# Concept
 
 ## 1. Overview
 This document describes the **conceptual architecture** for running **local DNS and HTTPS** in a **100% local Kubernetes environment** that closely **mimics real production systems**.
 
 The goal is not step-by-step setup, but to explain **how the pieces fit together** and **why each component exists**, so the same mental model can later be applied to real cloud environments.
 
-## 2. Core Components
+## 2. Target Domain Model
+
+The system is designed to support a SaaS-style hostname structure such as:
+
+| Domain | Usage |
+| --- | --- |
+| [https://docs.saas.test](https://docs.saas.test) | This documentation runs locally |
+| [https://api.saas.test](https://api.saas.test) | - |
+| [https://ui.saas.test](https://ui.saas.test) | - |
+| [https://tenant1.saas.test](https://tenant1.saas.test) | - |
+| [https://app1.tenant1.saas.test](https://app1.tenant1.saas.test) | - |
+
+All domains are resolved via local authoritative DNS and served over HTTPS using certificates trusted by the developer’s OS and browser.
+
+## 3. Core Components
 
 The architecture is built from the following roles:
 
@@ -28,21 +42,6 @@ The architecture is built from the following roles:
   Terminates HTTPS and routes traffic to services inside the cluster.
 
 This stack works consistently across **Windows, macOS, and Linux**, and with **kind, k3s, or k3d**.
-
-
-## 3. Target Domain Model
-
-The system is designed to support a SaaS-style hostname structure such as:
-
-```
-[https://api.saas.test](https://api.saas.test)
-[https://ui.saas.test](https://ui.saas.test)
-[https://tenant1.saas.test](https://tenant1.saas.test)
-[https://app1.tenant1.saas.test](https://app1.tenant1.saas.test)
-```
-
-All domains are resolved via local authoritative DNS and served over HTTPS using certificates trusted by the developer’s OS and browser.
-
 
 ## 4. HTTPS Guarantee
 

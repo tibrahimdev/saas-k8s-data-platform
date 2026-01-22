@@ -1,32 +1,5 @@
 # Install Local Kubernetes Clusters
 
-## Using Minikube
-### Install Minikube
-Follow instruction on https://minikube.sigs.k8s.io/docs/start/.
-
-### Creating Minikube Clusters
-
-```bash
-# Creating SaaS cluster with named cluster "saas-minikube"
-minikube start -p saas-minikube
-
-# Creating SaaS cluster with named cluster "saas-minikube"
-# And adjust cpus memory limit
-minikube start -p saas-minikube --cpus=4 --memory=8192
-```
-
-On WSL2 (experimental - see [#5392](https://github.com/kubernetes/minikube/issues/5392)), you may need to run:
-```bash
-sudo mkdir /sys/fs/cgroup/systemd && sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
-```
-
-### Deleting Minikube Cluster
-```bash
-minikube delete -p saas-minikube
-```
-
----
-
 ## Using Kind
 ### Install kind
 
@@ -107,6 +80,33 @@ Note: If using a named cluster you will need to specify the name of the cluster:
 ```bash
 kind load docker-image my-app:latest --name test-cluster
 ```
+
+## Using Minikube
+### Install Minikube
+Follow instruction on https://minikube.sigs.k8s.io/docs/start/.
+
+### Creating Minikube Clusters
+
+```bash
+# Creating SaaS cluster with named cluster "saas-minikube"
+minikube start -p saas-minikube
+
+# Creating SaaS cluster with named cluster "saas-minikube"
+# And adjust cpus memory limit
+minikube start -p saas-minikube --cpus=4 --memory=8192
+```
+
+On WSL2 (experimental - see [#5392](https://github.com/kubernetes/minikube/issues/5392)), you may need to run:
+```bash
+sudo mkdir /sys/fs/cgroup/systemd && sudo mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+```
+
+### Deleting Minikube Cluster
+```bash
+minikube delete -p saas-minikube
+```
+
+---
 
 ## Bootstrap the cluster
 We have convenient script to bootstrap the cluster located at `scripts/bootstrap-cluster.sh`.
