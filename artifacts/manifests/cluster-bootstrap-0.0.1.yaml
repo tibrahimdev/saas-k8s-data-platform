@@ -1,0 +1,66 @@
+# Create namespaces
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: saas-system
+  labels:
+    saas.vendor.com/role: system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: saas-workload
+  labels:
+    saas.vendor.com/role: workload
+---
+# Protect saas-system
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: protect-saas-system
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["DELETE"]
+        resources: ["namespaces"]
+  validations:
+    - expression: oldObject.metadata.labels["saas.vendor.com/allow-delete"] != null || oldObject.metadata.name != "saas-system"
+      message: "Cannot delete saas-system namespace without breakglass. Add label saas.vendor.com/allow-delete=true to proceed."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: protect-saas-system
+spec:
+  policyName: protect-saas-system
+  validationActions:
+    - Deny
+---
+# Protect saas-workload
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: protect-saas-workload
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["DELETE"]
+        resources: ["namespaces"]
+  validations:
+    - expression: oldObject.metadata.labels["saas.vendor.com/allow-delete"] != null || oldObject.metadata.name != "saas-workload"
+      message: "Cannot delete saas-workload namespace without breakglass. Add label saas.vendor.com/allow-delete=true to proceed."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: protect-saas-workload
+spec:
+  policyName: protect-saas-workload
+  validationActions:
+    - Deny

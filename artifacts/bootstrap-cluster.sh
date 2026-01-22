@@ -1,53 +1,62 @@
 #!/bin/sh
 set -eu
 
+START_TIME=$(date +%s)
 echo "Starting bootstrap..."
 
 # ---- token check ----
 if [ -z "${BOOTSTRAP_TOKEN:-}" ]; then
-  echo "BOOTSTRAP_TOKEN is not set"
+  echo "BOOTSTRAP_TOKEN is not set. Exiting"
   exit 1
 fi
 
-# # Defaults
-# DEFAULT_BRANDING=saas
-# DEFAULT_WORKSPACE=workspace
-# DEFAULT_MANIFEST_URL="https://example.com/releases/v1.0.0/install.yaml"
-# KUBEVELA_VERSION=1.10.6
+# Defaults
+DEFAULT_BRANDING=saas
+DEFAULT_WORKSPACE=workspace
+DEFAULT_MANIFEST_URL="https://saas.test/manifests/cluster-bootstrap-0.0.1.yaml"
+KUBEVELA_VERSION=1.10.6
 
-# # ---- preflight ----
-# echo "Prerequisite checks:"
-# if command -v kubectl >/dev/null 2>&1; then
-#   echo "kubectl available"
-# else
-#   echo "kubectl not installed. Installing..."
-# fi
+# ---- preflight ----
+echo "Prerequisite checks:"
+if command -v kubectl >/dev/null 2>&1; then
+  echo "kubectl available"
+else
+  echo "kubectl not installed. Installing..."
+fi
 
-# if command -v vela >/dev/null 2>&1; then
-#   echo "vela available"
-# else
-#   echo "vela not installed. Installing..."
-#   curl -fsSl https://kubevela.io/script/install.sh | bash
-# fi
+if command -v vela >/dev/null 2>&1; then
+  echo "vela available"
+else
+  echo "vela not installed. Installing..."
+  curl -fsSl https://kubevela.io/script/install.sh | bash
+fi
 
-# echo "Preflight OK"
-# echo "--------------------"
+echo "Preflight OK"
+echo "--------------------"
 
-# BRANDING="${1:-${BRANDING:-$DEFAULT_BRANDING}}"
-# WORKSPACE="${1:-${WORKSPACE:-$DEFAULT_WORKSPACE}}"
-# NAMESPACE=$WORKSPACE
-# DEPLOYMENT="${BRANDING}-controller"
-# MANIFEST_URL="${1:-${MANIFEST_URL:-$DEFAULT_MANIFEST_URL}}"
+BRANDING="${1:-${BRANDING:-$DEFAULT_BRANDING}}"
+WORKSPACE="${1:-${WORKSPACE:-$DEFAULT_WORKSPACE}}"
+NAMESPACE=$WORKSPACE
+DEPLOYMENT="${BRANDING}-controller"
+MANIFEST_URL="${1:-${MANIFEST_URL:-$DEFAULT_MANIFEST_URL}}"
+
+SYSTEM_NAMESPACE="${BRANDING}-system"
+WORKLOAD_NAMESPACE="${BRANDING}-workload"
 # TIMEOUT="120s"
 
-# echo "--------------------"
-# echo "Using manifest: ${MANIFEST_URL}"
-# echo "Workspace: ${WORKSPACE}"
-# echo "Namespace: ${WORKSPACE}"
-# echo "--------------------"
+echo "--------------------"
+echo "Using manifest: ${MANIFEST_URL}"
+echo "Workspace: ${WORKSPACE}"
+echo "--------------------"
+
+# Namespace preparation
+# It creates 2 namespace: saas-system, saas-workload
+# And apply delete protection using ValidatingAdmissionPolicy
+echo "Setting up namespaces..."
+curl -sSL https://saas.test/manifests/cluster-bootstrap-0.0.1.yaml | kubectl apply -f -
 
 # echo "Installing kubevela..."
-# vela install --version ${KUBEVELA_VERSION}
+# vela install --version ${KUBEVELA_VERSION} --namespace $SYSTEM_NAMESPACE
 
 # echo "Installing addon velaux..."
 # vela addon enable velaux
@@ -86,3 +95,17 @@ fi
 
 # echo "--------------------"
 # echo "Control plane agent installed and healthy"
+
+sleep 5
+
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+# Convert seconds to human-readable format
+hours=$((DURATION / 3600))
+minutes=$(( (DURATION % 3600) / 60 ))
+seconds=$((DURATION % 60))
+
+echo "--------------------"
+echo "✅ Cluster bootstrap completed successfully."
+echo "Cluster bootstrap completed in ${hours}h ${minutes}m ${seconds}s"
