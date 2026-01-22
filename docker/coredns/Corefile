@@ -3,6 +3,7 @@ saas.test {
     errors
 
     hosts {
+        {$HOST_IP} saas.test
         {$HOST_IP} ca.saas.test
         {$HOST_IP} docs.saas.test
         {$HOST_IP} ui.saas.test
