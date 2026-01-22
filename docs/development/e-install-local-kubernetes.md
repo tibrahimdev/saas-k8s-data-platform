@@ -35,29 +35,33 @@ go install sigs.k8s.io/kind@v0.31.0
 ```
 ### Creating kind Cluster
 
-For example, let’s say you create two clusters:
+Since we're about to replicate as much as we can with production grade clusters, we will
+use the YAML config file so we can configure more.
+
 ```bash
-kind create cluster # Default cluster context name is `kind`.
-...
-kind create cluster --name saas
+cd clusters/kind/
+
+# Creating SaaS cluster
+
+# Creating Tenant cluster
+kind create cluster --config=kind-saas-tenant-cluster.yaml
 ```
 
 When you list your kind clusters, you will see something like the following:
 ```bash
 kind get clusters
 kind
-saas
+saas-tenant-test
 ```
 
 In order to interact with a specific cluster, you only need to specify the cluster name as a context in kubectl:
 ```bash
-kubectl cluster-info --context kind-kind
-kubectl cluster-info --context kind-saas
+kubectl cluster-info --context kind-saas-tenant-test
 ```
 
 Also if above command not working, can use this to set kubernetes context:
 ```bash
-kind export kubeconfig --name saas --kubeconfig "$KUBECONFIG"
+kind export kubeconfig --name saas-tenant-test --kubeconfig "$KUBECONFIG"
 ```
 
 After that you can start interact using `kubectl` or `k9s`.
@@ -67,10 +71,26 @@ To show current cluster + context that you're CLI working on:
 kubectl config current-context
 ```
 
+### Adding labels and taints
+
+Adding labels:
+```bash
+kubectl label node saas-tenant-test-worker node-role.kubernetes.io/default=
+kubectl label node saas-tenant-test-worker2 node-role.kubernetes.io/database=
+```
+
+```bash
+# All database workload must use "saas-tenant-test-worker2"
+kubectl taint nodes saas-tenant-test-worker2 workload=database:NoSchedule
+```
+
 ### Deleting a Kind Cluster
 If you created a cluster with kind create cluster then deleting is equally simple:
 ```bash
 kind delete cluster
+
+# with specific name
+kind delete cluster --name saas-tenant-test
 ```
 If the flag `--name` is not specified, kind will use the default cluster context name kind and delete that cluster.
 
@@ -86,4 +106,11 @@ kind load docker-image my-app:latest my-db:latest my-cache:latest
 Note: If using a named cluster you will need to specify the name of the cluster:
 ```bash
 kind load docker-image my-app:latest --name test-cluster
+```
+
+## Bootstrap the cluster
+We have convenient script to bootstrap the cluster located at `scripts/bootstrap-cluster.sh`.
+
+```bash
+WORKSPACE=ws1 BOOTSTRAP_TOKEN=mytoken ./scripts/bootstrap-cluster.sh
 ```

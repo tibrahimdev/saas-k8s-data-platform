@@ -209,4 +209,4 @@ You now have:
 * Zero browser warnings
 
 ## Next Steps
-- [Setting Up Local DNS + HTTPS Environment](./b_setup_local_dns.md)
+- [Bootstraping CA](./b-bootstraping-ca.md)

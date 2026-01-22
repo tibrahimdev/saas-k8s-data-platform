@@ -4,9 +4,15 @@ nav:
   - Home: index.md
   - Features:
       - features/overview.md
+  - Development:
+      - Overview: development/index.md
+      - development/index.md
+      - development/a-local-concept.md
+      - development/b-bootstraping-ca.md
+      - development/c-setup-dns.md
+      - development/e-install-local-kubernetes.md
   - Deployments:
       - Overview: deployments/index.md
-      - deployments/k3s.md
 
 theme:
   name: material

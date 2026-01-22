@@ -18,9 +18,12 @@ Now we need to install KubeVela Core into the Kubernetes cluster.
 
 ```bash
 export KUBEVELA_VERSION=1.10.6
-helm repo add kubevela https://kubevela.github.io/charts
-helm repo update
-helm install --create-namespace -n vela-system kubevela kubevela/vela-core --wait --version $KUBEVELA_VERSION
+vela install --version ${KUBEVELA_VERSION} \
+  --set nodeSelector.NodeGroupType=core \
+  --set "tolerations[0].key=workload" \
+  --set "tolerations[0].operator=Equal" \
+  --set "tolerations[0].value=core" \
+  --set "tolerations[0].effect=NoSchedule"
 ```
 
 ## Install VelaUX and other addons
@@ -33,4 +36,9 @@ vela addon enable fluxcd
 ## Uninstall Kubevela
 ```bash
 vela uninstall --force
+```
+
+Delete all CRD from cluster using
+```bash
+kubectl get crd |grep oam | awk '{print $1}' | xargs kubectl delete crd
 ```

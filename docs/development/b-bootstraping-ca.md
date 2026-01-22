@@ -123,4 +123,4 @@ At this point:
 * ✅ Ready to issue unlimited certificates
 
 ## Next
-- **Set Up Local DNS for `saas.test`**
+- [Setting Up Local DNS](./c-setup-dns.md)
