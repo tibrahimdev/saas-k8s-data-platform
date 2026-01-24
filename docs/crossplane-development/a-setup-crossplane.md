@@ -31,6 +31,37 @@ helm upgrade --install crossplane --namespace crossplane-system oci://xpkg.upbou
 
 Port forward:
 
+## Install Web UI
+
+### CrossView
+Add the Helm repository
+```bash
+helm repo add crossview https://corpobit.github.io/crossview
+helm repo update
+```
+Install the chart
+```bash
+helm install crossview crossview/crossview \
+  --namespace saas-dev \
+  --set secrets.dbPassword=your-db-password \
+  --set secrets.sessionSecret=$(openssl rand -base64 32)
+```
+
+### komoplane
+Add the Helm repository
+```bash
+helm repo add komodorio https://helm-charts.komodor.io
+helm repo update komodorio
+```
+
+Install
+```bash
+helm upgrade --install komoplane komodorio/komoplane \
+  --namespace saas-dev \
+  --set imagePullSecrets[0].name=docker-secret
+```
+
+
 ## Develop Crossplane Package (XRD)
 
 Create a new directory, let's call it `saas`. Inside that directory, add one file called `crossplane.yaml`.

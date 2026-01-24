@@ -1,0 +1,31 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: saas-workspace
+spec:
+  compositeTypeRef:
+    apiVersion: platform.saas.test/v1
+    # apiVersion: platform.saas.test/v1alpha1
+    kind: Workspace
+  pipeline:
+    - step: bootstrap
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: workspace-bootstrap-secret
+            base:
+              apiVersion: v1
+              kind: Secret
+              type: Opaque
+              metadata:
+                name: workspace-bootstrap-secret
+                namespace: saas-workload
+            patches:
+              - fromFieldPath: spec.bootstrapToken
+                toFieldPath: stringData.bootstrap-token
+            readinessChecks:
+              - type: NonEmpty
+                fieldPath: data.bootstrap-token

@@ -1,0 +1,50 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: workspaces.platform.saas.test
+spec:
+  group: platform.saas.test
+  names:
+    kind: Workspace
+    plural: workspaces
+  scope: Namespaced
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                extWorkspaceId:
+                  description: External workspace ID
+                  type: string
+                bootstrapToken:
+                  description: Workspace bootstrap token
+                  type: string
+                appConfigs:
+                  description: Optional per-app configuration, e.g., Helm overrides
+                  type: object
+              required:
+                - extWorkspaceId
+                - bootstrapToken
+            status:
+              type: object
+              properties:
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                      reason:
+                        type: string
