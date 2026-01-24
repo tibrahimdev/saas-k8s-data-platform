@@ -24,12 +24,12 @@ parameter: {
 		//+usage=Namespace to deploy to, defaults to saas-workload
 		namespace: *"saas-workload" | string
 
-		postgres: {
-			// +usage=Name of the Postgres component (CloudNativePG)
-			componentName: *"jupyterhub-postgres" | string
+		// postgres: {
+		// 	// +usage=Name of the Postgres component (CloudNativePG)
+		// 	componentName: *"jupyterhub-postgres" | string
 
-			// +usage=Database name used by JupyterHub
-			database: *"jupyterhub" | string
-		}
+		// 	// +usage=Database name used by JupyterHub
+		// 	database: *"jupyterhub" | string
+		// }
 	}
 }

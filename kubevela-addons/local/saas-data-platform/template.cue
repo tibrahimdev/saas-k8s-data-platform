@@ -4,25 +4,17 @@ output: {
 	kind:       "Application"
 	spec: {
 		components: [
-			{
-				type: "k8s-objects"
-				name: "workspace-ns"
-				properties: objects: [{
-					apiVersion: "v1"
-					kind: "Namespace"
-					metadata: name: parameter.namespace
-				}]
-			},
-			certManager,
+			// certManager,
+			jupyterhub,
 		]
 		policies: [
-			{
-				type: "shared-resource"
-				name: "namespace"
-				properties: rules: [{
-					selector: resourceTypes: ["Namespace"]
-				}]
-			},
+			// {
+			// 	type: "shared-resource"
+			// 	name: "namespace"
+			// 	properties: rules: [{
+			// 		selector: resourceTypes: ["Namespace"]
+			// 	}]
+			// },
 			// {
 			// 	name: "read-only-ns"
 			// 	type: "read-only"
