@@ -1,0 +1,2 @@
+# Don't add xpkg crossplane packages
+*.xpkg

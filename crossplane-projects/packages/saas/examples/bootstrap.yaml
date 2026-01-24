@@ -1,0 +1,10 @@
+apiVersion: platform.saas.io/v1alpha1
+kind: SaaSBootstrap
+metadata:
+  name: bootstrap
+spec:
+  bootstrap:
+    secretRef:
+      name: saas-secrets
+      namespace: default
+      key: bootstrap_token
