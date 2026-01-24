@@ -1,0 +1,25 @@
+workspace:
+  name: my-workspace
+  extWorkspaceId: w-123456
+storage:
+  storageClass:
+services:
+  bff:
+  jupyterhub:
+    parameters: {}
+    db: postgres
+    userStorage:
+  hiveMetastore:
+    parameters: {}
+    db: postgres
+    dependsOn:
+  trino:
+    parameters: {}
+    dependsOn:
+      - hiveMetastore
+      - karpenter
+  superset:
+    parameters: {}
+    db: postgres
+    dependsOn:
+      - trino

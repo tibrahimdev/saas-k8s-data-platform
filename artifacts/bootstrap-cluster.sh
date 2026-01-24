@@ -16,6 +16,9 @@ DEFAULT_WORKSPACE=workspace
 DEFAULT_MANIFEST_URL="https://saas.test/manifests/cluster-bootstrap-0.0.1.yaml"
 DEFAULT_KUBEVELA_HELM_URI=https://saas.test/charts/vela-core-1.10.6-saas.1.tgz
 
+# Versions
+CLOUDNATIVEPG_VERSION=1.28
+
 # ---- preflight ----
 echo "Prerequisite checks:"
 if command -v kubectl >/dev/null 2>&1; then
@@ -57,21 +60,26 @@ echo "--------------------"
 echo "Setting up namespaces..."
 curl -sSL https://saas.test/manifests/cluster-bootstrap-0.0.1.yaml | kubectl apply -f -
 
-# Install KubeVela
+# KubeVela
 # Allow user to answer n, but continue
 echo "Installing KubeVela control plane..."
 if ! vela install -f $DEFAULT_KUBEVELA_HELM_URI -n $KUBEVELA_SYSTEM_NAMESPACE; then
   echo "KubeVela installation skipped (existing installation preserved). Continuing bootstrap..."
 fi
 
+# VelaUX
 echo "Installing addon velaux..."
 vela addon enable velaux 
 
+# FluxCD
 echo "Installing addon fluxcd..."
 vela addon enable fluxcd namespace=$SYSTEM_NAMESPACE
 
-# echo "Installing addon chartmuseum..."
-# vela addon enable chartmuseum
+# CloudNativePG
+echo "Installing addon CloudNativePG operator..."
+curl -sSfL \
+  https://raw.githubusercontent.com/cloudnative-pg/artifacts/release-${CLOUDNATIVEPG_VERSION}/manifests/operator-manifest.yaml | \
+  kubectl apply --server-side -f -
 
 # echo "Installing ${DEPLOYMENT}..."
 
