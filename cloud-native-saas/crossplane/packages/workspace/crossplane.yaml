@@ -1,0 +1,7 @@
+apiVersion: meta.pkg.crossplane.io/v1
+kind: Configuration
+metadata:
+  name: saas
+spec:
+  crossplane:
+    version: ">=2.0.0"
