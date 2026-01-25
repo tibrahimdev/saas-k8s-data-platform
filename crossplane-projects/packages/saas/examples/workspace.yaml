@@ -6,3 +6,5 @@ metadata:
 spec:
   extWorkspaceId: ws-1234
   bootstrapToken: supersecret
+  # jupyterhub:
+  #   valuesRef: jupyter-values

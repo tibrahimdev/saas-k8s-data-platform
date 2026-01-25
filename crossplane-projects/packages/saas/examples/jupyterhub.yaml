@@ -1,0 +1,13 @@
+apiVersion: platform.saas.test/v1alpha1
+kind: Jupyterhub
+metadata:
+  name: jupyterhub
+  namespace: saas-workload
+spec:
+  extWorkspaceId: ws-1234
+  # bootstrapToken: supersecret
+  # jupyterhub:
+  #   valuesRef: jupyter-values
+  providerConfigRef:
+    name: provider-helm
+    kind: ClusterProviderConfig

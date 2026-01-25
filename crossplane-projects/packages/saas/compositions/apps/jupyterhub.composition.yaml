@@ -1,0 +1,51 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: saas-jupyterhub-app
+  namespace: crossplane-system
+spec:
+  compositeTypeRef:
+    apiVersion: platform.saas.test/v1alpha1
+    kind: Jupyterhub
+  pipeline:
+    - step: helm
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: jupyterhub
+            base:
+              apiVersion: helm.m.crossplane.io/v1beta1
+              kind: Release
+              metadata:
+                name: jupyterhub
+              spec:
+                providerConfigRef:
+                  name: provider-helm
+                  kind: ProviderConfig
+                forProvider:
+                  chart:
+                    name: jupyterhub
+                    repository: https://jupyterhub.github.io/helm-chart/
+                    version: 4.3.2
+                  # pullSecretRef:
+                  #   name: museum-creds
+                  #   namespace: default
+                  # namespace: saas-workload
+              #   insecureSkipTLSVerify: true
+              #   skipCreateNamespace: true
+              #   wait: true
+              #   skipCRDs: true
+                  values:
+                    fullnameOverride: "jupyterhub"
+                  # set:
+                  #   - name: param1
+                  #     value: value2
+            # patches:
+            #   - fromFieldPath: spec.bootstrapToken
+            #     toFieldPath: stringData.bootstrap-token
+            # readinessChecks:
+            #   - type: NonEmpty
+            #     fieldPath: data.bootstrap-token

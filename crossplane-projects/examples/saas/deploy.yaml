@@ -3,4 +3,4 @@ kind: Configuration
 metadata:
   name: saas
 spec:
-  package: ghcr.io/tibrahimdev/saas:v0.0.1-rc4
+  package: ghcr.io/tibrahimdev/saas:v0.0.1-rc22

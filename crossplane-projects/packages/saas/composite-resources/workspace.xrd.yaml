@@ -26,9 +26,18 @@ spec:
                 bootstrapToken:
                   description: Workspace bootstrap token
                   type: string
-                appConfigs:
-                  description: Optional per-app configuration, e.g., Helm overrides
-                  type: object
+                # appConfigs:
+                #   description: Optional per-app configuration, e.g., Helm overrides
+                #   type: object
+
+                # jupyterhub:
+                #   type: object
+                #   properties:
+                #     image:
+                #       description: Jupyterhub image
+                #       type: string
+                #   # x-kubernetes-preserve-unknown-fields: true
+
               required:
                 - extWorkspaceId
                 - bootstrapToken
