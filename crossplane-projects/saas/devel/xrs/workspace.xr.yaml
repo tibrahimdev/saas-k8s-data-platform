@@ -1,7 +1,7 @@
 apiVersion: platform.saas.test/v1alpha1
 kind: Workspace
 metadata:
-  name: my-workspace
+  name: ws-1234
   namespace: saas-workload
 spec:
   extWorkspaceId: ws-1234

@@ -1,7 +1,7 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: saas-workspace
+  name: workspace
 spec:
   compositeTypeRef:
     apiVersion: platform.saas.test/v1alpha1
