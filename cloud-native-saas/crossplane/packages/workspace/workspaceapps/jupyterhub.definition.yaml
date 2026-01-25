@@ -1,0 +1,35 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: jupyterhubs.platform.saas.test
+spec:
+  group: platform.saas.test
+  names:
+    kind: Jupyterhub
+    plural: jupyterhubs
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                workspaceRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                version:
+                  description: Jupyterhub helm chart version
+                  type: string
+                values:
+                  type: object
+                  description: "Extra user-defined values"
+                  x-kubernetes-preserve-unknown-fields: true
+              required:
+                - workspaceRef

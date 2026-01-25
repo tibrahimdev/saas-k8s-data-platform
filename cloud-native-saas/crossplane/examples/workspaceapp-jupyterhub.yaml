@@ -1,0 +1,9 @@
+apiVersion: platform.saas.test/v1alpha1
+kind: Jupyterhub
+metadata:
+  name: jupyterhub
+  namespace: saas-workload
+spec:
+  workspaceRef:
+    name: ws-12345
+  version: 4.3.0
