@@ -1,0 +1,57 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: databases.platform.saas.test
+spec:
+  group: platform.saas.test
+  names:
+    kind: Database
+    plural: databases
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                engine:
+                  type: string
+                  description: "Database engine options"
+                  enum: ["postgres", "mysql"] # allowed options
+                size:
+                  type: string
+                  description: "Database size options"
+                  enum: ["small", "medium", "large"] # optional enum
+                highAvailability:
+                  type: boolean
+                  description: "Enable HA"
+                backend:
+                  type: string
+                  description: "Database backend options"
+                  enum: ["cloudnativepg", "rds"] # allowed options
+                credentialsSecretRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: "Secret name containing DB credentials"
+              required:
+                - engine
+      additionalPrinterColumns:
+        - name: Engine
+          type: string
+          jsonPath: .spec.engine
+        - name: Size
+          type: string
+          jsonPath: .spec.size
+        - name: Backend
+          type: string
+          jsonPath: .spec.backend
+        - name: HA
+          type: boolean
+          jsonPath: .spec.highAvailability

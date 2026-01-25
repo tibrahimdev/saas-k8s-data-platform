@@ -1,0 +1,30 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: workspaceapps.platform.saas.test
+spec:
+  group: platform.saas.test
+  names:
+    kind: WorkspaceApp
+    plural: workspaceapps
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  description: Workspace App name
+                  type: string
+                workspaceRef:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Workspace to link

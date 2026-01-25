@@ -1,0 +1,48 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: database-cnpg
+spec:
+  compositeTypeRef:
+    apiVersion: platform.saas.test/v1alpha1
+    kind: Database
+  pipeline:
+    - step: choose-backend
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+      input:
+        patches:
+          - fromFieldPath: "spec.backend"
+            toFieldPath: "spec.forProvider.backend"
+          - fromFieldPath: "spec.engine"
+            toFieldPath: "spec.forProvider.engine"
+    - step: create-database
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: database-cnpg
+            base:
+              apiVersion: postgresql.cnpg.io/v1
+              kind: Cluster
+              metadata:
+                name: ""
+                namespace: saas-workload
+            patches:
+              - fromFieldPath: metadata.name
+                toFieldPath: metadata.name
+            #     transforms:
+            #       - type: string
+            #         string:
+            #           type: Format
+            #           fmt: "%s-bootstrap"
+            #   - fromFieldPath: spec.bootstrapToken
+            #     toFieldPath: stringData.bootstrap-token
+            # readinessChecks:
+            #   - type: NonEmpty
+            #     fieldPath: data.bootstrap-token
+    - step: automatically-detect-readiness
+      functionRef:
+        name: function-auto-ready

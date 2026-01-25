@@ -1,0 +1,24 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: saas-workspaceapp
+spec:
+  compositeTypeRef:
+    apiVersion: platform.saas.test/v1alpha1
+    kind: WorkspaceApp
+  pipeline:
+    - step: init
+      functionRef:
+        name: crossplane-contrib-function-patch-and-transform
+  # resources:
+  #   - name: configmap
+  #     base:
+  #       apiVersion: v1
+  #       kind: ConfigMap
+  #       metadata:
+  #         name: simple-app-config
+  #       data:
+  #         dbPassword: ""
+  #     patches:
+  #       - fromFieldPath: "spec.values.dbPassword"
+  #         toFieldPath: "data.dbPassword"

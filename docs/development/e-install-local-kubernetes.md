@@ -15,6 +15,7 @@ use the YAML config file so we can configure more.
 cd clusters/kind/
 
 # Creating SaaS cluster
+TODO
 
 # Creating Tenant cluster
 kind create cluster --config=kind-saas-tenant-cluster.yaml
@@ -42,6 +43,14 @@ After that you can start interact using `kubectl` or `k9s`.
 To show current cluster + context that you're CLI working on:
 ```bash
 kubectl config current-context
+```
+
+### [TODO] Bootstraping The Cluster Using Script
+
+We have convenient script to bootstrap Kind cluster located at `artifacts/cluster-bootstraps/bootstrap-kind.sh`.
+
+```bash
+WORKSPACE=ws1 BOOTSTRAP_TOKEN=mytoken ./artifacts/cluster-bootstraps/bootstrap-kind.sh
 ```
 
 ### Adding labels and taints
@@ -199,11 +208,3 @@ kubectl patch -n kube-system deployment metrics-server --type=json \
   -p '[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
 ```
 
----
-
-## Bootstrap the cluster
-We have convenient script to bootstrap the cluster located at `scripts/bootstrap-cluster.sh`.
-
-```bash
-WORKSPACE=ws1 BOOTSTRAP_TOKEN=mytoken ./scripts/bootstrap-cluster.sh
-```

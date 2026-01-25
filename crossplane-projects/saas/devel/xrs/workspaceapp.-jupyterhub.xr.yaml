@@ -1,0 +1,13 @@
+apiVersion: platform.saas.test/v1alpha1
+kind: WorkspaceApp
+metadata:
+  name: workspace-app-name
+spec:
+  workspaceRef:
+    name: workspace-name
+  # valuesFrom:
+  #   - secretKeyRef:
+  #       name: my-workspace-secret
+  #       namespace: saas-workload
+  #       key: dbPassword
+  #       targetPath: spec.values.dbPassword

@@ -1,0 +1,19 @@
+apiVersion: platform.saas.test/v1alpha1
+kind: Database
+metadata:
+  name: mypostresdb
+  namespace: saas-workload
+spec:
+  engine: postgres
+  size: small
+  highAvailability: true
+  backend: cloudnativepg
+
+  # advanced users can add extra options if needed
+  # extra:
+  #   cloudnativepg:
+  #     storageClass: fast
+  #   rds:
+  #     dbInstanceClass: db.t3.medium
+  # credentialsSecretRef:
+  #   name: workspace-secrets
