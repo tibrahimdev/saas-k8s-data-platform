@@ -19,6 +19,10 @@ vela addon enable velaux
 
 # Installing addon fluxcd
 vela addon enable fluxcd namespace=$SYSTEM_NAMESPACE
+
+# Enable Terraform addon
+https://github.com/kubevela/terraform-controller
+vela addon enable terraform
 ```
 
 

@@ -1,0 +1,7 @@
+description: SaaS workspace addon.
+icon: ""
+invisible: false
+name: workspace
+tags:
+- saas
+version: 0.0.1
