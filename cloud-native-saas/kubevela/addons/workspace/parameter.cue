@@ -18,14 +18,17 @@ parameter: {
 		db: {
 			provider:    *"kubernetes" | "cloud-managed"
 			storageSize: *"10Gi" | string
-			password: *"password" | string
+			password:    *"password" | string
 
 			if provider == "kubernetes" {
 				cnpg: {
 					instances:  *1 | int
 					database:   *"jupyterhub" | string
 					owner:      *"jupyterhub" | string
-					secretName: *"app-db-credentials" | string
+					secretName: *"jupyter-cnpg-secret" | string
+
+					superuserSecretName:   *"jupyter-cnpg-superuser-secret" | string
+					enableSuperuserAccess: *false | bool
 				}
 			}
 
