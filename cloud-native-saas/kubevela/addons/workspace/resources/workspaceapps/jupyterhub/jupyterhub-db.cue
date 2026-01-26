@@ -16,14 +16,15 @@ jupyterhubKubernetesDb: {
 				storage: {
 					size: parameter.jupyterhub.db.storageSize
 				}
-				// bootstrap: {
-				//   initdb: {
-				//     database: "jupyterhub"
-				//     owner:   "jupyterhub"
-				//   }
-				// }
+				superuserSecret: name: "pg-superuser"
+				bootstrap: {
+					initdb: {
+						database: parameter.jupyterhub.db.cnpg.database
+						owner:    parameter.jupyterhub.db.cnpg.owner
+						secret: name: parameter.jupyterhub.db.cnpg.secretName
+					}
+				}
 			}
-		}
+		},
 	]
 }
-

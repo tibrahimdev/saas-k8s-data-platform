@@ -80,4 +80,19 @@ Configure RBAC to allow Crossplane manage CNPG
 kubectl apply -f crossplane/rbac/allow-crossplane-manage-cnpg.yaml
 ```
 
+For demo or test purpose, we can create predefined secret container password to be reused later.
 
+```bash
+kubectl create secret generic app-db-credentials \
+  -n saas-workload \
+  --from-literal=username=appuser \
+  --from-literal=password=app-password
+```
+
+And one for the superuser
+```bash
+kubectl create secret generic pg-superuser \
+  -n saas-workload \
+  --from-literal=username=postgres \
+  --from-literal=password=super-secret
+```

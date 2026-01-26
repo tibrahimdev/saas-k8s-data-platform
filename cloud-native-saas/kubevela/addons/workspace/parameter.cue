@@ -16,12 +16,16 @@ parameter: {
 		version:   *"4.3.2" | string
 
 		db: {
-			provider: *"kubernetes" | "cloud-managed" 
+			provider:    *"kubernetes" | "cloud-managed"
 			storageSize: *"10Gi" | string
+			password: *"password" | string
 
 			if provider == "kubernetes" {
 				cnpg: {
-					instances: *1 | int
+					instances:  *1 | int
+					database:   *"jupyterhub" | string
+					owner:      *"jupyterhub" | string
+					secretName: *"app-db-credentials" | string
 				}
 			}
 

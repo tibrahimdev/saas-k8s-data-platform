@@ -12,13 +12,13 @@ jupyterhub: {
 		version:         parameter.jupyterhub.version
 		values:
 			fullnameOverride: "jupyterhub"
-		// 	hub: {
-		// 		db: {
-		// 			type: "postgres"
-		// 			password: "${dbPassword}"
-		// 			url: "postgresql+psycopg2://${dbUser}@${dbHost}:5432/${dbName}"
-		// 		}
-		// 	}
+			hub: {
+				db: {
+					type: "postgres"
+					password: parameter.jupyterhub.db.password
+					url: "postgresql+psycopg2://jupyterhub@$jupyterhub-db-rw.saas-workload.svc.cluster.local:5432/jupyterhub"
+				}
+			}
     //   proxy: {
     //     service: {
 		// 			type: "LoadBalancer"
@@ -40,3 +40,19 @@ jupyterhub: {
 }
 
 jupyterhubSteps: *[] | [...{...}]
+jupyterhubSteps: [
+	{
+		type: "read-object"
+		name: "read-db-secret"
+		properties: {
+			apiVersion: "v1"
+			kind: "Secret"
+			name: "jupyterhub-db-app"
+		}
+		outputs: [
+			{
+				
+			}
+		]
+	}
+]
