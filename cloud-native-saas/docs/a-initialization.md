@@ -1,5 +1,27 @@
 # Initialization
 
+## Install Some CLI/IDE Tools
+
+[KCL language server](https://www.kcl-lang.io/docs/user_docs/getting-started/install#install-language-server)
+```bash
+wget -q https://kcl-lang.io/script/install-kcl-lsp.sh -O - | /bin/bash
+```
+
+## Install Kubevela
+Due to issue with admission control webhook timeout, we will install from local chart
+```bash
+# Run these from root directory of this cloned repo
+export DEFAULT_KUBEVELA_HELM_URI=artifacts/charts/vela-core
+vela install -f $DEFAULT_KUBEVELA_HELM_URI
+
+# Install velaux
+vela addon enable velaux
+
+# Installing addon fluxcd
+vela addon enable fluxcd namespace=$SYSTEM_NAMESPACE
+```
+
+
 ## Install Crossplane
 ### Preparation
 
