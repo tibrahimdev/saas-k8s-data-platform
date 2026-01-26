@@ -1,17 +1,21 @@
 apiVersion: apiextensions.crossplane.io/v1
 kind: Composition
 metadata:
-  name: function-template-python
+  name: jupyterhub
+  namespace: crossplane-system
 spec:
   compositeTypeRef:
-    apiVersion: example.crossplane.io/v1
-    kind: XR
+    apiVersion: platform.saas.test/v1alpha1
+    kind: Jupyterhub
   mode: Pipeline
   pipeline:
-  - step: run-the-template
-    functionRef:
-      name: function-template-python
-    input:
-      apiVersion: template.fn.crossplane.io/v1beta1
-      kind: Input
-      version: v1beta2
+    - step: deploy
+      functionRef:
+        name: function-workspaceapps
+      requirements:
+        requiredResources:
+        - requirementName: workspace-bootstrap-secret
+          apiVersion: v1
+          kind: Secret
+          name: app-configuration
+          namespace: default

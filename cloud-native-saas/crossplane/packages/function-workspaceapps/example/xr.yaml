@@ -1,7 +1,10 @@
-# Replace this with your XR!
-apiVersion: example.crossplane.io/v1
-kind: XR
+apiVersion: platform.saas.test/v1alpha1
+kind: Jupyterhub
 metadata:
-  name: example-xr
+  name: jupyterhub
+  namespace: saas-workload
 spec:
-  region: us-east-2
+  workspaceRef:
+    name: ws-12345
+  version: 4.3.0
+  database: {}
