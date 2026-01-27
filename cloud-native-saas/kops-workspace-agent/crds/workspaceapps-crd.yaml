@@ -19,10 +19,8 @@ spec:
                   type: string
                 name:
                   type: string
-                enabled:
-                  type: boolean
-                helmValues:
-                  type: object
+                status:
+                  type: string
   scope: Namespaced
   names:
     plural: workspaceapplications
