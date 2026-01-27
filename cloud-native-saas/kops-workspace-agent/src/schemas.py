@@ -16,8 +16,19 @@ class WorkspaceSpec(BaseModel):
     bootstrapToken: str
 
 
+class WorkspaceAppPollResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    uid: str
+    name: str
+    version: str
+    status: str
+
+
 class WorkspacePollResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     status: str
     extWorkspaceId: str
+
+    workspaceApps: List[WorkspaceAppPollResponse]

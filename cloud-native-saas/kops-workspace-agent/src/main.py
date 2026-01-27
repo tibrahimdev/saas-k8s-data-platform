@@ -1,21 +1,6 @@
-"""
-cloud-native-saas.kops-workspace-agent.src.main
-
-A minimal Kopf operator example for the Workspace resource.
-
-This operator demonstrates:
-- Watching a custom resource of kind Workspace
-- Running a periodic timer to sync/reconcile
-- Logging spec fields for demonstration purposes
-
-Expected environment variables:
-- KOPF_GROUP_SELECTOR: CRD group (default: "platform.saas.test")
-- KOPF_VERSION_SELECTOR: CRD version (default: "v1alpha1")
-- KOPF_KIND_SELECTOR: CRD kind (default: "workspace")
-- KOPF_TIMER_INTERVAL: Timer interval in seconds (default: 10)
-"""
-
 import asyncio
+import hashlib
+import json
 from typing import Optional
 import kopf
 import logging
@@ -25,23 +10,32 @@ import requests
 from kubernetes import client, config
 from kubernetes.client.exceptions import ApiException
 from pydantic import ValidationError
-from schemas import WorkspacePollResponse, WorkspaceSpec
+from schemas import WorkspaceAppPollResponse, WorkspacePollResponse, WorkspaceSpec
 
 # Kopf selectors from environment
-KOPF_GROUP_SELECTOR = os.getenv("KOPF_GROUP_SELECTOR", "platform.saas.test")
-KOPF_VERSION_SELECTOR = os.getenv("KOPF_VERSION_SELECTOR", "v1alpha1")
-KOPF_KIND_SELECTOR = os.getenv("KOPF_KIND_SELECTOR", "workspace")
 KOPF_TIMER_INTERVAL = float(os.getenv("KOPF_TIMER_INTERVAL", 10))
 
+GROUP = os.getenv("GROUP", "platform.saas.test")
+VERSION = os.getenv("VERSION", "v1alpha1")
+
 # Workspace config
-WORKSPACE_CA_PATH = os.getenv("WORKSPACE_CA_PATH", "../../docker/step-ca/certs/root_ca.crt")
-WORKSPACE_CA_ENABLE = False
+WORKSPACE_ID = os.getenv("WORKSPACE_ID", "w-12345")
+WORKSPACE_CA_PATH = os.getenv(
+    "WORKSPACE_CA_PATH", "../../docker/step-ca/certs/root_ca.crt"
+)
+WORKSPACE_CA_VERIFY = False
 WORKSPACE_POLL_URL = os.getenv(
     "WORKSPACE_URL", "https://saas.test/dummyapi/workspace-w-12345-config.json"
 )
-WORKSPACE_NAMESPACE = os.getenv("WORKSPACE_NAMESPACE", "saas-system")
+WORKSPACE_SYSTEM_NAMESPACE = os.getenv("WORKSPACE_SYSTEM_NAMESPACE", "saas-system")
+WORKSPACE_WORKLOAD_NAMESPACE = os.getenv(
+    "WORKSPACE_WORKLOAD_NAMESPACE", "saas-workload"
+)
 
-VERIFY_CA = True if WORKSPACE_CA_ENABLE else False
+# Status
+WORKSPACE_APP_CREATED_STATUS = "PROVISIONING"
+
+VERIFY_CA = True if WORKSPACE_CA_VERIFY else False
 
 LOCK: asyncio.Lock
 
@@ -59,15 +53,20 @@ async def startup_fn(logger, **kwargs):
     global LOCK
     LOCK = asyncio.Lock()
 
-@kopf.on.startup() # type: ignore
+
+@kopf.on.startup()  # type: ignore
 def configure(settings: kopf.OperatorSettings, **_):
     settings.posting.level = logging.WARNING
     settings.watching.connect_timeout = 1 * 60
     settings.watching.server_timeout = 10 * 60
 
-@kopf.on.login() # type: ignore
+
+@kopf.on.login()  # type: ignore
 def login_fn(**kwargs):
-    return kopf.login_with_service_account(**kwargs) or kopf.login_with_kubeconfig(**kwargs)
+    return kopf.login_with_service_account(**kwargs) or kopf.login_with_kubeconfig(
+        **kwargs
+    )
+
 
 @kopf.on.cleanup()  # type: ignore
 async def cleanup_fn(logger, **kwargs):
@@ -86,13 +85,14 @@ def fetch_workspace() -> Optional[WorkspacePollResponse]:
         logging.error(f"Failed to fetch workspace config: {e}")
         return None
 
+
 def delete_workspace_cr(name, logger):
     logger.info(f"Deleting Workspace {name}")
     try:
         api.delete_namespaced_custom_object(
-            group=KOPF_GROUP_SELECTOR,
-            version=KOPF_VERSION_SELECTOR,
-            namespace=WORKSPACE_NAMESPACE,
+            group=GROUP,
+            version=VERSION,
+            namespace=WORKSPACE_SYSTEM_NAMESPACE,
             plural="workspaces",
             name=name,
         )
@@ -100,32 +100,106 @@ def delete_workspace_cr(name, logger):
     except ApiException as e:
         logger.error(f"Failed to delete Workspace CR {name}: {e}")
 
+
+def compute_digest(spec):
+    spec_bytes = json.dumps(spec, sort_keys=True).encode("utf-8")
+    return hashlib.sha256(spec_bytes).hexdigest()
+
+
+def desired_workspace_application_cr(app_name, workspace_name, status, namespace):
+    return {
+        "apiVersion": f"{GROUP}/{VERSION}",
+        "kind": "WorkspaceApplication",
+        "metadata": {
+            "name": app_name,
+            "namespace": namespace,
+        },
+        "spec": {
+            "workspaceRef": workspace_name,
+            "name": app_name,
+            "status": status,
+        },
+    }
+
+
+def create_workspace_application_cr(app_name, status, logger):
+    body = {
+        "apiVersion": f"{GROUP}/{VERSION}",
+        "kind": "WorkspaceApplication",
+        "metadata": {
+            "name": app_name,
+            "namespace": WORKSPACE_SYSTEM_NAMESPACE,
+        },
+        "spec": {
+            "workspaceRef": WORKSPACE_ID,
+            "name": app_name,
+            "status": status,
+        },
+    }
+    api.create_namespaced_custom_object(
+        group=GROUP,
+        version=VERSION,
+        namespace=WORKSPACE_SYSTEM_NAMESPACE,
+        plural="workspaceapplications",
+        body=body,
+    )
+    return "created"
+
+
+def get_or_create_workspace_app(name, logger):
+    try:
+        obj = api.get_namespaced_custom_object(
+            group=GROUP,
+            version=VERSION,
+            namespace=WORKSPACE_SYSTEM_NAMESPACE,
+            plural="workspaceapplications",
+            name=name,
+        )
+        logger.info(f"Workspace application found: {name}")
+        return obj
+    except ApiException as e:
+        if e.status == 404:
+            body = {
+                "apiVersion": f"{GROUP}/{VERSION}",
+                "kind": "WorkspaceApplication",
+                "metadata": {
+                    "name": name,
+                    "namespace": WORKSPACE_SYSTEM_NAMESPACE,
+                },
+                "spec": {
+                    "workspaceRef": WORKSPACE_ID,
+                    "name": name,
+                    "status": WORKSPACE_APP_CREATED_STATUS,
+                },
+            }
+            obj = api.create_namespaced_custom_object(
+                group=GROUP,
+                version=VERSION,
+                namespace=WORKSPACE_SYSTEM_NAMESPACE,
+                plural="workspaceapplications",
+                body=body,
+            )
+            logger.info(f"Workspace application is created: {name}")
+            return obj
+        else:
+            logger.error(f"Workspace application error: {name} {e.reason}")
+
+
 @kopf.timer(
-    KOPF_GROUP_SELECTOR,
-    KOPF_VERSION_SELECTOR,
-    KOPF_KIND_SELECTOR,
+    GROUP,
+    VERSION,
+    "workspace",
     interval=KOPF_TIMER_INTERVAL,
 )  # type: ignore
 def reconcile_workspace(name, namespace, spec, status, patch, logger, **kwargs):
-    """
-    Periodic sync handler for Workspace resources.
 
-    Args:
-        name (str): Name of the Workspace CR.
-        namespace (str): Namespace of the Workspace CR.
-        spec (dict): The spec field of the CR.
-        status (dict): Current status of the CR.
-        patch (kopf.Patch): Patch object to modify status.
-        logger (logging.Logger): Logger for output.
-        **kwargs: Additional Kopf-provided arguments.
-
-    Logs a field from the Workspace spec every interval.
-    """
-    # Poll workspace
+    # Poll workspace to control plane API
     workspace = fetch_workspace()
     if not workspace:
         logger.error("Workspace cant be None")
         return
+
+    extWorkspaceId = workspace.extWorkspaceId
 
     # Validate workspace CR
     try:
@@ -133,10 +207,24 @@ def reconcile_workspace(name, namespace, spec, status, patch, logger, **kwargs):
     except ValidationError as e:
         logger.error(f"Invalid spec for workspace {name}: {e}")
         return
-    
-    if workspace.status in ('DELETING', 'DELETED'):
-        delete_workspace_cr(workspace.extWorkspaceId, logger)
 
-    # # Safely access 'field' in spec, fallback if not present
-    # field_value = spec.get("field", "<not-set>")
-    # logger.info(f"[Workspace Sync] {name=} in {namespace=}: field={field_value!r}")
+    # Handle workspace deletion
+    # Must consider the child/owned resources
+    # Delete must disallowed if still have childs
+    if workspace.status in ("DELETING", "DELETED"):
+        delete_workspace_cr(extWorkspaceId, logger)
+
+    # Handle workspace apps
+    desired_apps = workspace.workspaceApps
+    for app in desired_apps:
+
+        app_name = app.name
+        app_status = app.status
+
+        if app.status in ("DELETING", "DELETED"):
+            logger.error("Delete workspace application not implemented yet!")
+            continue
+
+        # Get existing or create new workspace app CR
+        app_cr = get_or_create_workspace_app(app_name, logger)
+        print(app_cr)
