@@ -1,0 +1,9 @@
+apiVersion: platform.saas.test/v1alpha1
+kind: Workspace
+metadata:
+  name: ws-12345
+  namespace: saas-system
+spec:
+  extWorkspaceId: ws-12345
+  bootstrapToken: supersecret
+  status: PROVISIONING

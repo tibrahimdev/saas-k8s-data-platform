@@ -1,0 +1,71 @@
+{
+  "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+  "extWorkspaceId": "ws-12345",
+  "name": "Example workspace",
+  "description": "Example workspace description",
+  "status": "DELETING",
+  "storage": {
+    "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+    "cloudProvider": {
+      "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+      "name": "AWS",
+      "displayName": "AWS"
+    },
+    "cloudRegion": {
+      "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+      "name": "ap-southeast-1",
+      "displayName": "AWS Singapore"
+    },
+    "storageName": "Example Storage",
+    "type": "Example Storage",
+    "storageConfig": {
+      "region": "string",
+      "key": "string",
+      "bucket": "string",
+      "type": "s3"
+    },
+    "createdAt": "2026-01-27T03:38:11.090Z",
+    "createdBy": {
+      "uid": "string",
+      "email": "string",
+      "fullName": "string"
+    }
+  },
+  "network": {
+    "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+    "cloudProvider": {
+      "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+      "name": "AWS",
+      "displayName": "AWS"
+    },
+    "cloudRegion": {
+      "uid": "83ef9fc3-159c-43fc-a31f-0d4575dc373c",
+      "name": "ap-southeast-1",
+      "displayName": "AWS Singapore"
+    },
+    "networkName": "Example VPC",
+    "networkConfig": {
+      "securityGroupIds": [
+        "string"
+      ],
+      "subnetIds": [
+        "string"
+      ],
+      "vpcId": "string",
+      "provider": "aws"
+    },
+    "createdAt": "2026-01-27T03:38:11.090Z",
+    "createdBy": {
+      "uid": "string",
+      "email": "string",
+      "fullName": "string"
+    }
+  },
+  "createdAt": "2026-01-27T03:38:11.090Z",
+  "createdBy": {
+    "uid": "string",
+    "email": "string",
+    "fullName": "string"
+  },
+  "updatedAt": "2026-01-27T03:38:11.090Z"
+}
