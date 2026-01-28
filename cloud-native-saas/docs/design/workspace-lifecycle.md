@@ -1,98 +1,92 @@
-# Workspace Lifecycle
+# **SaaS Tenant Agent Lifecycle Blueprint**
 
-## **SaaS Tenant Agent Lifecycle**
+## **1. Day 0 — Bootstrap**
 
-### **Phase 0 — Bootstrap / Initial Reconciliation**
+* 1.1 Bootstrap script creates:
+   - CRDs
+   - Workspace CR: name, bootstrapToken
 
-**When:** First timer run after the tenant agent is installed.
+* 1.2 **Poll SaaS workspace config** → get list of apps/addons + workspace metadata.
+* 1.3 **For each app in desired list**:
 
-**Steps:**
+  * 1.3.1 Create **WorkspaceApplication CR**
+  * 1.3.2 Trigger KubeVela addon deployment.
 
-1. Poll the SaaS control plane for workspace configuration.
-2. Compute **desired state**:
+* 1.4 **Mark state/digest** of CR specs for future delta detection.
+* 1.5 **Result:** Workspace fully represented in K8s, all desired apps deployed.
 
-   * Workspace metadata (name, namespace, labels, etc.)
-   * Enabled apps/addons list
-   * Parameters for each app
-3. Create **Workspace CR** in Kubernetes.
-4. For each app in the desired list:
+**Visual state:**
 
-   * Create **WorkspaceApplication CR**
-   * Trigger KubeVela addon deployment
-5. Mark hashes/digests of CR specs for future delta comparison.
+```
+Workspace CR -> exists
+App1 CR -> deployed
+App2 CR -> deployed
+App3 CR -> deployed
+```
 
-**Key Notes:**
+## **Day 1–N — Incremental Updates**
 
-* Idempotent: repeated bootstrap should not create duplicates.
-* All initial CRs are considered **canonical source**.
+* **Poll SaaS workspace config** → compute desired state.
+* **Compare with existing CRs** using digest/hash:
 
-### **Phase 1 — Incremental Updates**
+  * **New apps** → create CR + deploy addon.
+  * **Updated apps** → update CR → triggers redeploy.
+  * **Removed apps**:
 
-**When:** Timer polls periodically (day 2, day 3, …).
+    * Delete CR → triggers addon deletion **OR**
+    * Soft-delete (`enabled: false`) → pause without deleting.
+* **Update Workspace CR metadata** if workspace-level fields changed.
 
-**Steps:**
+**Visual state example:**
 
-1. Poll SaaS for workspace configuration.
-2. Compute desired state hashes for apps.
-3. Fetch existing WorkspaceApplication CRs for this workspace.
-4. Compare:
+* App2 config changed → updated
+* App4 added → new CR + deployed
+* App3 removed → soft-deleted or deleted
 
-   * **New apps:** create CRs and deploy addons.
-   * **Changed apps:** update CRs → triggers redeploy/reconfigure in KubeVela.
-   * **Removed apps:** either delete CRs or soft-delete (set `enabled: false`) depending on policy.
-5. Optional: update Workspace CR metadata if any workspace-level fields changed.
+```
+Workspace CR -> exists
+App1 CR -> unchanged
+App2 CR -> updated
+App3 CR -> soft-deleted
+App4 CR -> deployed
+```
 
-**Key Notes:**
+## **Soft-delete / Disable apps**
 
-* Use hash comparison to avoid unnecessary updates.
-* Respect soft-delete flag if enabled.
-* Should be idempotent and safe to rerun if previous operations partially failed.
+* **SaaS marks app as `enabled: false`**
+* Agent updates CR with `enabled: false`
+* KubeVela addon may scale down / pause
+* Retain CR in cluster for reactivation
 
-### **Phase 2 — Soft Delete / Disable**
+**Visual state:**
 
-**When:** SaaS marks an app as `enabled: false` instead of removing it entirely.
+```
+App3 CR -> enabled: false (paused)
+```
 
-**Steps:**
+## **Workspace Deletion**
 
-1. Detect the app in desired state but with `enabled: false`.
-2. Update WorkspaceApplication CR with `enabled: false`.
-3. KubeVela addon may be scaled down / paused instead of fully deleted (optional behavior).
-4. Retain CR in cluster for future reactivation.
+* **SaaS removes workspace**
+* Agent detects workspace no longer exists
+* Delete all WorkspaceApplication CRs → triggers addon deletion
+* Delete Workspace CR
 
-**Key Notes:**
+**Visual state:**
 
-* Useful if SaaS user wants to temporarily disable a feature.
-* Avoids full redeploy on re-enable.
+```
+Workspace CR -> deleted
+All App CRs -> deleted
+```
 
-### **Phase 3 — Workspace Deletion**
+## **Edge/Recovery**
 
-**When:** SaaS workspace is removed entirely.
+* **Partial failure / network issues** → retry in next poll
+* **Manual edits in cluster** → agent can overwrite unless explicitly excluded
+* **SaaS API downtime** → agent waits for next timer run
 
-**Steps:**
+## **Optional Enhancements**
 
-1. Detect workspace no longer exists in SaaS.
-2. Delete all WorkspaceApplication CRs.
-
-   * Triggers KubeVela to delete corresponding addons.
-3. Delete Workspace CR.
-
-**Key Notes:**
-
-* Should be done carefully; consider a “finalizer” pattern to ensure all CRs are cleaned.
-* Optional: retain backup metadata before deletion if required.
-
-### **Phase 4 — Edge / Recovery Handling**
-
-* Partial failure in update → keep delta comparison for next timer run.
-* Manual CR edits in cluster → agent may overwrite if not explicitly excluded.
-* Handle SaaS API downtime gracefully → retry timer next run.
-
-### **High-level Summary Table**
-
-| Phase | Trigger | Action | CR Behavior |
-| --- | --- | --- | --- |
-| 0 Bootstrap          | First run            | Create Workspace & App CRs | Deploy addons                     |
-| 1 Incremental update | Timer run            | Diff desired vs existing   | Create/update/delete apps         |
-| 2 Soft-delete        | App disabled in SaaS | Update `enabled: false`    | Retain CR, optionally pause addon |
-| 3 Workspace deletion | Workspace removed    | Delete Workspace & app CRs | Delete addons                     |
-| 4 Recovery           | Errors / partial ops | Retry next timer           | Idempotent operations             |
+1. **Delta cache** → keep hash of last applied state to avoid unnecessary updates.
+2. **Batch CR operations** → reduce K8s API calls.
+3. **Finalizers** → ensure complete cleanup on workspace deletion.
+4. **Soft-delete history** → retain metadata for auditing or quick rollback.

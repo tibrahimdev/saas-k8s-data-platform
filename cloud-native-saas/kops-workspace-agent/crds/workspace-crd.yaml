@@ -15,9 +15,6 @@ spec:
             spec:
               type: object
               properties:
-                status:
-                  type: string
-                  description: Workspace status
                 extWorkspaceId:
                   type: string
                   description: "External workspace ID defined by SaaS side"
@@ -25,9 +22,25 @@ spec:
                   type: string
                   description: "Workspace bootstrap token"
               required:
-                - status
                 - extWorkspaceId
                 - bootstrapToken
+            status:
+              type: object
+              properties:
+                phase:
+                  type: string
+                  description: High-level lifecycle phase
+                  enum:
+                    - Pending
+                    - Reconciling
+                    - Ready
+                    - Failed
+                    - Deleting
+                message:
+                  type: string
+                lastUpdated:
+                  type: string
+                  format: date-time
   scope: Namespaced
   names:
     plural: workspaces

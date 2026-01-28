@@ -1,0 +1,18 @@
+apiVersion: v1
+entries:
+  jupyterhub:
+  - annotations:
+      addon.name: jupyterhub
+    apiVersion: v2
+    appVersion: 0.0.1
+    created: "2026-01-27T14:23:33.234197253+07:00"
+    description: Jupyterhub workspace app addon.
+    digest: 64e68e3da9e6531b19036698f8da8b7d67d02ce32d8610ddd5fc706b4bae5607
+    keywords:
+    - workspaceapps
+    name: jupyterhub
+    type: library
+    urls:
+    - https://saas.test/addons/jupyterhub-0.0.1.tgz
+    version: 0.0.1
+generated: "2026-01-27T14:23:33.232537412+07:00"
